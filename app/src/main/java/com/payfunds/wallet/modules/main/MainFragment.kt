@@ -1,0 +1,431 @@
+package com.payfunds.wallet.modules.main
+
+import android.graphics.Rect
+import android.os.Bundle
+import android.view.ViewTreeObserver
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BadgedBox
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import com.payfunds.wallet.R
+import com.payfunds.wallet.core.BaseComposeFragment
+import com.payfunds.wallet.core.findActivity
+import com.payfunds.wallet.core.managers.RateAppManager
+import com.payfunds.wallet.core.slideFromBottom
+import com.payfunds.wallet.core.slideFromRight
+import com.payfunds.wallet.core.stats.StatEntity
+import com.payfunds.wallet.core.stats.StatEvent
+import com.payfunds.wallet.core.stats.StatPage
+import com.payfunds.wallet.core.stats.stat
+import com.payfunds.wallet.core.stats.statTab
+import com.payfunds.wallet.modules.balance.ui.BalanceScreen
+import com.payfunds.wallet.modules.main.MainModule.MainNavigation
+import com.payfunds.wallet.modules.manageaccount.dialogs.BackupRequiredDialog
+import com.payfunds.wallet.modules.market.MarketScreen
+import com.payfunds.wallet.modules.rateapp.RateApp
+import com.payfunds.wallet.modules.rooteddevice.RootedDeviceModule
+import com.payfunds.wallet.modules.rooteddevice.RootedDeviceScreen
+import com.payfunds.wallet.modules.rooteddevice.RootedDeviceViewModel
+import com.payfunds.wallet.modules.settings.main.SettingsScreen
+import com.payfunds.wallet.modules.tor.TorStatusView
+import com.payfunds.wallet.modules.transactions.TransactionsModule
+import com.payfunds.wallet.modules.transactions.TransactionsScreen
+import com.payfunds.wallet.modules.transactions.TransactionsViewModel
+import com.payfunds.wallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
+import com.payfunds.wallet.modules.walletconnect.WCManager.SupportState
+import com.payfunds.wallet.ui.compose.ComposeAppTheme
+import com.payfunds.wallet.ui.compose.components.BadgeText
+import com.payfunds.wallet.ui.compose.components.HsBottomNavigation
+import com.payfunds.wallet.ui.compose.components.HsBottomNavigationItem
+import com.payfunds.wallet.ui.extensions.WalletSwitchBottomSheet
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+class MainFragment : BaseComposeFragment() {
+
+    @Composable
+    override fun GetContent(navController: NavController) {
+        val backStackEntry = navController.safeGetBackStackEntry(R.id.mainFragment)
+
+        backStackEntry?.let {
+            val viewModel =
+                ViewModelProvider(backStackEntry.viewModelStore, TransactionsModule.Factory())
+                    .get(TransactionsViewModel::class.java)
+            MainScreenWithRootedDeviceCheck(
+                transactionsViewModel = viewModel,
+                navController = navController,
+            )
+        } ?: run {
+            requireActivity().recreate()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().moveTaskToBack(true)
+                }
+            })
+    }
+
+}
+
+@Composable
+private fun MainScreenWithRootedDeviceCheck(
+    transactionsViewModel: TransactionsViewModel,
+    navController: NavController,
+    rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory())
+) {
+    if (rootedDeviceViewModel.showRootedDeviceWarning) {
+        RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
+    } else {
+        MainScreen(transactionsViewModel, navController)
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@Composable
+private fun MainScreen(
+    transactionsViewModel: TransactionsViewModel,
+    fragmentNavController: NavController,
+    viewModel: MainViewModel = viewModel(factory = MainModule.Factory())
+) {
+
+    val uiState = viewModel.uiState
+    val context = LocalContext.current
+    val selectedPage = uiState.selectedTabIndex
+    val pagerState = rememberPagerState(initialPage = selectedPage) { uiState.mainNavItems.size }
+    val coroutineScope = rememberCoroutineScope()
+    val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val keyboardState = keyboardAsState()
+    LaunchedEffect(Unit) {
+        context.findActivity()?.let { activity ->
+            activity.intent?.data?.let { uri ->
+                viewModel.handleDeepLink(uri)
+                activity.intent?.data = null
+            }
+        }
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = modalBottomSheetState,
+        sheetBackgroundColor = ComposeAppTheme.colors.transparent,
+        sheetContent = {
+            WalletSwitchBottomSheet(
+                wallets = viewModel.wallets,
+                watchingAddresses = viewModel.watchWallets,
+                selectedAccount = uiState.activeWallet,
+                onSelectListener = {
+                    coroutineScope.launch {
+                        modalBottomSheetState.hide()
+                        viewModel.onSelect(it)
+
+                        stat(
+                            page = StatPage.SwitchWallet,
+                            event = StatEvent.Select(StatEntity.Wallet)
+                        )
+                    }
+                },
+                onCancelClick = {
+                    coroutineScope.launch {
+                        modalBottomSheetState.hide()
+                    }
+                }
+            )
+        }
+    ) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            containerColor = ComposeAppTheme.colors.tyler,
+            bottomBar = {
+                if (!keyboardState.value){
+                    Column {
+                        if (uiState.torEnabled) {
+                            TorStatusView()
+                        }
+                        HsBottomNavigation(
+                            backgroundColor = ComposeAppTheme.colors.tyler,
+                            elevation = 8.dp
+                        ) {
+                            uiState.mainNavItems.forEach { item ->
+                                HsBottomNavigationItem(
+                                    icon = {
+                                        BadgedIcon(item.badge) {
+                                            Icon(
+                                                painter = painterResource(item.mainNavItem.iconRes),
+                                                contentDescription = stringResource(item.mainNavItem.titleRes)
+                                            )
+                                        }
+                                    },
+                                    label = {
+                                        Text(
+                                            maxLines = 1,
+                                            modifier = Modifier.padding(top = 4.dp),
+                                            color = if (item.selected) ComposeAppTheme.colors.redG else ComposeAppTheme.colors.grey,
+                                            style = ComposeAppTheme.typography.micro,
+                                            fontSize = 9.sp,
+                                            overflow = TextOverflow.Ellipsis,
+                                            text = stringResource(item.mainNavItem.titleRes).uppercase(),
+                                        )
+                                    },
+                                    selected = item.selected,
+                                    enabled = item.enabled,
+                                    selectedContentColor = ComposeAppTheme.colors.jacob,
+                                    unselectedContentColor = if (item.enabled) ComposeAppTheme.colors.grey else ComposeAppTheme.colors.grey50,
+                                    onClick = {
+                                        viewModel.onSelect(item.mainNavItem)
+                                        stat(
+                                            page = StatPage.Main,
+                                            event = StatEvent.SwitchTab(item.mainNavItem.statTab)
+                                        )
+                                    },
+                                    onLongClick = {
+                                        if (item.mainNavItem == MainNavigation.Home) {
+                                            coroutineScope.launch {
+                                                modalBottomSheetState.show()
+
+                                                stat(
+                                                    page = StatPage.Main,
+                                                    event = StatEvent.Open(StatPage.SwitchWallet)
+                                                )
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+
+                        }
+                    }
+                }
+            }
+        ) {
+            BackHandler(enabled = modalBottomSheetState.isVisible) {
+                coroutineScope.launch {
+                    modalBottomSheetState.hide()
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(it)
+            ) {
+                LaunchedEffect(key1 = selectedPage, block = {
+                    pagerState.scrollToPage(selectedPage)
+                })
+
+                HorizontalPager(
+                    modifier = Modifier.weight(1f),
+                    state = pagerState,
+                    userScrollEnabled = false,
+                    verticalAlignment = Alignment.Top
+                ) { page ->
+                    when (uiState.mainNavItems[page].mainNavItem) {
+                        MainNavigation.Home -> BalanceScreen(fragmentNavController)
+                        MainNavigation.Market -> MarketScreen(fragmentNavController)
+                        MainNavigation.Transactions -> TransactionsScreen(fragmentNavController, transactionsViewModel)
+                        MainNavigation.Settings -> SettingsScreen(fragmentNavController)
+                    }
+                }
+            }
+        }
+        HideContentBox(uiState.contentHidden)
+    }
+
+    /*    if (DashboardObject.notificationWalletAddress == null) viewModel.onSelect(MainNavigation.Home)
+        else viewModel.onSelect(MainNavigation.Market)*/
+
+
+//    if (uiState.showWhatsNew) {
+//        LaunchedEffect(Unit) {
+//            fragmentNavController.slideFromBottom(
+//                R.id.releaseNotesFragment,
+//                ReleaseNotesFragment.Input(true)
+//            )
+//            viewModel.whatsNewShown()
+//        }
+//    }
+
+    if (uiState.showRateAppDialog) {
+        val context = LocalContext.current
+        RateApp(
+            onRateClick = {
+                RateAppManager.openPlayMarket(context)
+                viewModel.closeRateDialog()
+            },
+            onCancelClick = { viewModel.closeRateDialog() }
+        )
+    }
+
+    if (uiState.wcSupportState != null) {
+        when (val wcSupportState = uiState.wcSupportState) {
+            SupportState.NotSupportedDueToNoActiveAccount -> {
+                fragmentNavController.slideFromBottom(R.id.wcErrorNoAccountFragment)
+            }
+
+            is SupportState.NotSupportedDueToNonBackedUpAccount -> {
+                val text = stringResource(R.string.WalletConnect_Error_NeedBackup)
+                fragmentNavController.slideFromBottom(
+                    R.id.backupRequiredDialog,
+                    BackupRequiredDialog.Input(wcSupportState.account, text)
+                )
+
+                stat(page = StatPage.Main, event = StatEvent.Open(StatPage.BackupRequired))
+            }
+
+            is SupportState.NotSupported -> {
+                fragmentNavController.slideFromBottom(
+                    R.id.wcAccountTypeNotSupportedDialog,
+                    WCAccountTypeNotSupportedDialog.Input(wcSupportState.accountTypeDescription)
+                )
+            }
+
+            else -> {}
+        }
+        viewModel.wcSupportStateHandled()
+    }
+
+    uiState.deeplinkPage?.let {
+            deepLinkPage ->
+        LaunchedEffect(Unit) {
+            delay(500)
+            fragmentNavController.slideFromRight(
+                deepLinkPage.navigationId,
+                deepLinkPage.input
+            )
+            viewModel.deeplinkPageHandled()
+        }
+    }
+
+    LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
+        viewModel.onResume()
+    }
+}
+
+@Composable
+private fun HideContentBox(contentHidden: Boolean) {
+    val backgroundModifier = if (contentHidden) {
+        Modifier.background(ComposeAppTheme.colors.tyler)
+    } else {
+        Modifier
+    }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .then(backgroundModifier)
+    )
+}
+
+@Composable
+private fun BadgedIcon(
+    badge: MainModule.BadgeType?,
+    icon: @Composable BoxScope.() -> Unit,
+) {
+    when (badge) {
+        is MainModule.BadgeType.BadgeNumber ->
+            BadgedBox(
+                badge = {
+                    BadgeText(
+                        text = badge.number.toString(),
+                    )
+                },
+                content = icon
+            )
+
+        MainModule.BadgeType.BadgeDot ->
+            BadgedBox(
+                badge = {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(
+                                ComposeAppTheme.colors.lucian,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                    ) { }
+                },
+                content = icon
+            )
+
+        else -> {
+            Box {
+                icon()
+            }
+        }
+    }
+}
+
+fun NavController.safeGetBackStackEntry(destinationId: Int): NavBackStackEntry? {
+    return try {
+        this.getBackStackEntry(destinationId)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+}
+
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val keyboardState = remember { mutableStateOf(false) }
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val onGlobalListener = ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = Rect()
+            view.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = view.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            keyboardState.value = keypadHeight > screenHeight * 0.15
+        }
+        view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
+
+        onDispose {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalListener)
+        }
+    }
+    return keyboardState
+}

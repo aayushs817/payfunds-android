@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="App_Name">PayFunds</string>
+    <string name="DeeplinkScheme" translatable="false">payfunds</string>
+</resources>

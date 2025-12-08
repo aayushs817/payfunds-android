@@ -1,0 +1,123 @@
+package com.payfunds.wallet.modules.main
+
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.tonapps.wallet.data.core.entity.SendRequestEntity
+import com.tonapps.wallet.data.tonconnect.entities.DAppRequestEntity
+import com.walletconnect.web3.wallet.client.Wallet
+import com.payfunds.wallet.core.App
+import com.payfunds.wallet.core.IAccountManager
+import com.payfunds.wallet.core.ILocalStorage
+import com.payfunds.wallet.core.managers.TonConnectManager
+import com.payfunds.wallet.core.managers.UserManager
+import com.payfunds.wallet.modules.walletconnect.WCDelegate
+import io.payfunds.core.IKeyStoreManager
+import io.payfunds.core.IPinComponent
+import io.payfunds.core.ISystemInfoManager
+import io.payfunds.core.security.KeyStoreValidationError
+import kotlinx.coroutines.launch
+
+class MainActivityViewModel(
+    private val userManager: UserManager,
+    private val accountManager: IAccountManager,
+    private val pinComponent: IPinComponent,
+    private val systemInfoManager: ISystemInfoManager,
+    private val keyStoreManager: IKeyStoreManager,
+    private val localStorage: ILocalStorage,
+    private val tonConnectManager: TonConnectManager
+) : ViewModel() {
+
+    val navigateToMainLiveData = MutableLiveData(false)
+    val wcEvent = MutableLiveData<Wallet.Model?>()
+    val tcSendRequest = MutableLiveData<SendRequestEntity?>()
+    val tcDappRequest = MutableLiveData<DAppRequestEntity?>()
+
+    init {
+        viewModelScope.launch {
+            userManager.currentUserLevelFlow.collect {
+                navigateToMainLiveData.postValue(true)
+            }
+        }
+        viewModelScope.launch {
+            WCDelegate.walletEvents.collect {
+                wcEvent.postValue(it)
+            }
+        }
+        viewModelScope.launch {
+            tonConnectManager.sendRequestFlow.collect {
+                tcSendRequest.postValue(it)
+            }
+        }
+        viewModelScope.launch {
+            tonConnectManager.dappRequestFlow.collect {
+                tcDappRequest.postValue(it)
+            }
+        }
+    }
+
+    fun onWcEventHandled() {
+        wcEvent.postValue(null)
+    }
+
+    fun onTcSendRequestHandled() {
+        tcSendRequest.postValue(null)
+    }
+
+    fun onTcDappRequestHandled() {
+        tcDappRequest.postValue(null)
+    }
+
+    fun validate() {
+        if (systemInfoManager.isSystemLockOff) {
+            throw MainScreenValidationError.NoSystemLock()
+        }
+
+        try {
+            keyStoreManager.validateKeyStore()
+        } catch (e: KeyStoreValidationError.UserNotAuthenticated) {
+            throw MainScreenValidationError.UserAuthentication()
+        } catch (e: KeyStoreValidationError.KeyIsInvalid) {
+            throw MainScreenValidationError.KeyInvalidated()
+        } catch (e: RuntimeException) {
+            throw MainScreenValidationError.KeystoreRuntimeException()
+        }
+
+        if (accountManager.isAccountsEmpty && !localStorage.mainShowedOnce) {
+            throw MainScreenValidationError.Welcome()
+        }
+
+        if (pinComponent.isLocked) {
+            throw MainScreenValidationError.Unlock()
+        }
+    }
+
+    fun onNavigatedToMain() {
+        navigateToMainLiveData.postValue(false)
+    }
+
+    class Factory : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return MainActivityViewModel(
+                App.userManager,
+                App.accountManager,
+                App.pinComponent,
+                App.systemInfoManager,
+                App.keyStoreManager,
+                App.localStorage,
+                App.tonConnectManager,
+            ) as T
+        }
+    }
+}
+
+sealed class MainScreenValidationError : Exception() {
+    class Welcome : MainScreenValidationError()
+    class Unlock : MainScreenValidationError()
+    class NoSystemLock : MainScreenValidationError()
+    class KeyInvalidated : MainScreenValidationError()
+    class UserAuthentication : MainScreenValidationError()
+    class KeystoreRuntimeException : MainScreenValidationError()
+}

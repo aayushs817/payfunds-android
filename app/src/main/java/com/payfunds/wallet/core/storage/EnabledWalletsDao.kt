@@ -1,0 +1,34 @@
+package com.payfunds.wallet.core.storage
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import com.payfunds.wallet.entities.EnabledWallet
+
+@Dao
+interface EnabledWalletsDao {
+
+    @Query("SELECT * FROM EnabledWallet ORDER BY `walletOrder` ASC")
+    fun enabledCoins(): List<EnabledWallet>
+
+    @Query("SELECT * FROM EnabledWallet WHERE accountId = :accountId ORDER BY `walletOrder` ASC")
+    fun enabledCoins(accountId: String): List<EnabledWallet>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(enabledWallet: EnabledWallet)
+
+    @Query("DELETE FROM EnabledWallet")
+    fun deleteAll()
+
+    @Transaction
+    fun insertWallets(enabledWallets: List<EnabledWallet>) {
+        enabledWallets.forEach { insert(it) }
+    }
+
+    @Delete
+    fun deleteWallets(enabledWallets: List<EnabledWallet>)
+
+}

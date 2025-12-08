@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sell_tokens">Sell Tokens</string>
+    <string name="buy_tokens">Buy Tokens</string>
+    <string name="you_re_receiving">You’re Receiving</string>
+    <string name="you_re_paying">You’re Paying</string>
+    <string name="sell_settings">Sell Settings</string>
+    <string name="buy_settings">Buy Settings</string>
+    <string name="swap_network_fee_description">This is the cost to process your transaction on the blockchain. Payfunds does not receive any share of these fees.</string>
+    <string name="if_the_price_slips_any_further_your_transaction_will_revert_below_is_the_minimum_amount_you_are_guaranteed_to_receive">If the price slips any further, your transaction will revert. Below is the minimum amount you are guaranteed to receive.</string>
+    <string name="slippage_may_be_higher_than_necessary">Slippage may be higher than necessary</string>
+    <string name="receive_at_least">Receive at least</string>
+    <string name="slippage_info_message">Your transaction will revert if the price changes more than the slippage percentage.</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_evening">Good Evening</string>
+    <string name="please_select_sell_token_first">Please select sell token first</string>
+    <string name="in_progress">%1$s in progress...</string>
+    <string name="approval_in_progress">Approval in progress...</string>
+    <string name="refreshing">Refreshing</string>
+    <string name="you_are_guaranteed_to_receive">You are guaranteed to receive: %1$s</string>
+</resources>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "337835818810",
+    "project_id": "payfunds-b7b8b",
+    "storage_bucket": "payfunds-b7b8b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337835818810:android:f8cddb11c366b167be9a03",
+        "android_client_info": {
+          "package_name": "com.payfunds.wallet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3oiA5uFCofGJgw-jzrWl7MXgXm5HjtNA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337835818810:android:3a73042bac8d62a8be9a03",
+        "android_client_info": {
+          "package_name": "com.payfunds.wallet.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3oiA5uFCofGJgw-jzrWl7MXgXm5HjtNA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

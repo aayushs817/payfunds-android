@@ -1,0 +1,23 @@
+include ':app'
+
+include ':core'
+include ':components:icons'
+include ':components:chartview'
+include ':marketkit:marketkit'
+
+include 'ethereumkit:erc20kit'
+include 'ethereumkit:ethereumkit'
+include 'ethereumkit:nftkit'
+include 'ethereumkit:oneinchkit'
+include 'ethereumkit:uniswapkit'
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://zendesk.jfrog.io/artifactory/repo" }
+
+        // REQUIRED for GitHub dependencies
+        maven { url "https://jitpack.io" }
+    }
+}

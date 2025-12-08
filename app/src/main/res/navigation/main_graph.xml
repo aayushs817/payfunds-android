@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.payfunds.wallet.modules.main.MainFragment" />
+    <fragment
+        android:id="@+id/depositCexFragment"
+        android:name="com.payfunds.wallet.modules.depositcex.DepositCexFragment" />
+    <fragment
+        android:id="@+id/sendEvmConfirmationFragment"
+        android:name="com.payfunds.wallet.modules.send.evm.confirmation.SendEvmConfirmationFragment" />
+    <fragment
+        android:id="@+id/sendEvmSettingsFragment"
+        android:name="com.payfunds.wallet.modules.send.evm.settings.SendEvmSettingsFragment" />
+    <fragment
+        android:id="@+id/filterCoinFragment"
+        android:name="com.payfunds.wallet.modules.transactions.FilterCoinFragment" />
+   <fragment
+        android:id="@+id/filterBlockchainFragment"
+       android:name="com.payfunds.wallet.modules.transactions.FilterBlockchainFragment" />
+   <fragment
+        android:id="@+id/transactionFilterFragment"
+       android:name="com.payfunds.wallet.modules.transactions.TransactionsFilterFragment" />
+    <fragment
+        android:id="@+id/transactionInfoFragment"
+        android:name="com.payfunds.wallet.modules.transactionInfo.TransactionInfoFragment" />
+    <fragment
+        android:id="@+id/transactionSpeedUpCancelFragment"
+        android:name="com.payfunds.wallet.modules.transactionInfo.options.TransactionSpeedUpCancelFragment" />
+    <fragment
+        android:id="@+id/transactionSpeedUpCancelTransactionSettings"
+        android:name="com.payfunds.wallet.modules.transactionInfo.options.TransactionSpeedUpCancelTransactionSettingsFragment" />
+    <fragment
+        android:id="@+id/resendBitcoinFragment"
+        android:name="com.payfunds.wallet.modules.transactionInfo.resendbitcoin.ResendBitcoinFragment" />
+    <fragment
+        android:id="@+id/manageWalletsFragment"
+        android:name="com.payfunds.wallet.modules.managewallets.ManageWalletsFragment" />
+    <fragment
+        android:id="@+id/manageAccountsFragment"
+        android:name="com.payfunds.wallet.modules.manageaccounts.ManageAccountsFragment" />
+    <fragment
+        android:id="@+id/manageAccountFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.ManageAccountFragment" />
+    <fragment
+        android:id="@+id/privateKeysFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.privatekeys.PrivateKeysFragment" />
+     <fragment
+        android:id="@+id/publicKeysFragment"
+         android:name="com.payfunds.wallet.modules.manageaccount.publickeys.PublicKeysFragment" />
+    <fragment
+        android:id="@+id/evmAddressFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.evmaddress.EvmAddressFragment" />
+    <fragment
+        android:id="@+id/recoveryPhraseFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.recoveryphrase.RecoveryPhraseFragment" />
+    <fragment
+        android:id="@+id/evmPrivateKeyFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.evmprivatekey.EvmPrivateKeyFragment" />
+    <fragment
+        android:id="@+id/showExtendedKeyFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.showextendedkey.ShowExtendedKeyFragment" />
+    <fragment
+        android:id="@+id/backupKeyFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.backupkey.BackupKeyFragment" />
+    <fragment
+        android:id="@+id/backupConfirmationKeyFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.backupconfirmkey.BackupConfirmKeyFragment" />
+    <fragment
+        android:id="@+id/backupLocalFragment"
+        android:name="com.payfunds.wallet.modules.backuplocal.BackupLocalFragment" />
+     <fragment
+        android:id="@+id/transactionLockTimeInfoFragment"
+         android:name="com.payfunds.wallet.modules.info.TransactionLockTimeInfoFragment" />
+    <fragment
+        android:id="@+id/transactionDoubleSpendInfoFragment"
+        android:name="com.payfunds.wallet.modules.info.TransactionDoubleSpendInfoFragment" />
+    <fragment
+        android:id="@+id/securitySettingsFragment"
+        android:name="com.payfunds.wallet.modules.settings.security.SecuritySettingsFragment" />
+    <fragment
+        android:id="@+id/blockchainSettingsFragment"
+        android:name="com.payfunds.wallet.modules.blockchainsettings.BlockchainSettingsFragment" />
+    <fragment
+        android:id="@+id/autoLockIntervalsFragment"
+        android:name="com.payfunds.wallet.modules.settings.security.autolock.AutoLockIntervalsFragment" />
+
+    <fragment
+        android:id="@+id/twoFactorAuthDisableFragment"
+        android:name="com.payfunds.wallet.modules.settings.security.twofactorauth.TwoFactorAuthDisableFragment" />
+
+    <fragment
+        android:id="@+id/twoFactorAuthRecoverCodeFragment"
+        android:name="com.payfunds.wallet.modules.settings.security.twofactorauth.TwoFactorAuthRecoverCodeFragment" />
+
+    <fragment
+        android:id="@+id/twoFactorAuthRecoverFragment"
+        android:name="com.payfunds.wallet.modules.settings.security.twofactorauth.TwoFactorAuthRecoverFragment" />
+
+    <fragment
+        android:id="@+id/twoFactorAuthEnableFragment"
+        android:name="com.payfunds.wallet.modules.settings.security.twofactorauth.TwoFactorAuthEnableFragment" />
+
+    <fragment
+        android:id="@+id/backupManagerFragment"
+        android:name="com.payfunds.wallet.modules.backuplocal.fullbackup.BackupManagerFragment" />
+    <fragment
+        android:id="@+id/faqListFragment"
+        android:name="com.payfunds.wallet.modules.settings.faq.FaqListFragment"
+        android:label="@string/Settings_Faq"/>
+    <fragment
+        android:id="@+id/academyFragment"
+        android:name="com.payfunds.wallet.modules.settings.guides.GuidesFragment"
+        android:label="@string/Guides_Title" />
+    <fragment
+        android:id="@+id/appearanceFragment"
+        android:name="com.payfunds.wallet.modules.settings.appearance.AppearanceFragment" />
+    <fragment
+        android:id="@+id/baseCurrencySettingsFragment"
+        android:name="com.payfunds.wallet.modules.basecurrency.BaseCurrencySettingsFragment" />
+    <fragment
+        android:id="@+id/personalSupportFragment"
+        android:name="com.payfunds.wallet.modules.settings.support.PersonalSupportFragment" />
+    <fragment
+        android:id="@+id/languageSettingsFragment"
+        android:name="com.payfunds.wallet.modules.settings.language.LanguageSettingsFragment" />
+    <fragment
+        android:id="@+id/termsFragment"
+        android:name="com.payfunds.wallet.modules.settings.terms.TermsFragment" />
+    <fragment
+        android:id="@+id/aboutAppFragment"
+        android:name="com.payfunds.wallet.modules.settings.about.AboutFragment" />
+    <fragment
+        android:id="@+id/donateAddressesFragment"
+        android:name="com.payfunds.wallet.modules.settings.donate.DonateAddressesFragment" />
+    <fragment
+        android:id="@+id/donateTokenSelectFragment"
+        android:name="com.payfunds.wallet.modules.settings.donate.DonateTokenSelectFragment" />
+
+
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.payfunds.wallet.modules.notification.NotificationFragment" />
+
+
+    <fragment
+        android:id="@+id/metricsPageFragment"
+        android:name="com.payfunds.wallet.modules.market.metricspage.MetricsPageFragment" />
+    <fragment
+        android:id="@+id/coinFragment"
+        android:name="com.payfunds.wallet.modules.coin.CoinFragment" />
+    <fragment
+        android:id="@+id/indicatorsFragment"
+        android:name="com.payfunds.wallet.modules.coin.indicators.IndicatorsFragment" />
+    <fragment
+        android:id="@+id/indicatorSettingsFragment"
+        android:name="com.payfunds.wallet.modules.coin.indicators.IndicatorSettingsFragment" />
+    <fragment
+        android:id="@+id/activateSubscription"
+        android:name="com.payfunds.wallet.modules.subscription.ActivateSubscriptionFragment" />
+    <fragment
+        android:id="@+id/subscriptionInfoFragment"
+        android:name="com.payfunds.wallet.modules.subscription.SubscriptionInfoFragment" />
+    <fragment
+        android:id="@+id/coinAnalyticsInfoFragment"
+        android:name="com.payfunds.wallet.modules.info.CoinAnalyticsInfoFragment" />
+    <fragment
+        android:id="@+id/overallScoreInfoFragment"
+        android:name="com.payfunds.wallet.modules.info.OverallScoreInfoFragment" />
+    <fragment
+        android:id="@+id/coinMajorHoldersFragment"
+        android:name="com.payfunds.wallet.modules.coin.majorholders.CoinMajorHoldersFragment" />
+    <fragment
+        android:id="@+id/coinRankFragment"
+        android:name="com.payfunds.wallet.modules.coin.ranks.CoinRankFragment" />
+    <fragment
+        android:id="@+id/coinTreasuriesFragment"
+        android:name="com.payfunds.wallet.modules.coin.treasuries.CoinTreasuriesFragment" />
+    <fragment
+        android:id="@+id/coinAuditsFragment"
+        android:name="com.payfunds.wallet.modules.coin.audits.CoinAuditsFragment" />
+    <fragment
+        android:id="@+id/coinInvestmentsFragment"
+        android:name="com.payfunds.wallet.modules.coin.investments.CoinInvestmentsFragment" />
+    <fragment
+        android:id="@+id/coinReportsFragment"
+        android:name="com.payfunds.wallet.modules.coin.reports.CoinReportsFragment" />
+ <fragment
+     android:id="@+id/coinDetectorsFragment"
+     android:name="com.payfunds.wallet.modules.coin.detectors.DetectorsFragment" />
+    <fragment
+        android:id="@+id/setPinFragment"
+        android:name="com.payfunds.wallet.modules.pin.SetPinFragment" />
+    <fragment
+        android:id="@+id/editPinFragment"
+        android:name="com.payfunds.wallet.modules.pin.EditPinFragment" />
+    <fragment
+        android:id="@+id/setDuressPinIntroFragment"
+        android:name="com.payfunds.wallet.modules.pin.SetDuressPinIntroFragment" />
+    <fragment
+        android:id="@+id/setDuressPinSelectAccounts"
+        android:name="com.payfunds.wallet.modules.pin.SetDuressPinSelectAccountsFragment" />
+    <fragment
+        android:id="@+id/setDuressPinFragment"
+        android:name="com.payfunds.wallet.modules.pin.SetDuressPinFragment" />
+    <fragment
+        android:id="@+id/editDuressPinFragment"
+        android:name="com.payfunds.wallet.modules.pin.EditDuressPinFragment" />
+    <fragment
+        android:id="@+id/confirmPinFragment"
+        android:name="com.payfunds.wallet.modules.pin.ConfirmPinFragment" />
+    <fragment
+        android:id="@+id/releaseNotesFragment"
+        android:name="com.payfunds.wallet.modules.releasenotes.ReleaseNotesFragment" />
+    <fragment
+        android:id="@+id/markdownFragment"
+        android:name="com.payfunds.wallet.modules.markdown.MarkdownFragment" />
+    <fragment
+        android:id="@+id/addTokenFragment"
+        android:name="com.payfunds.wallet.modules.addtoken.AddTokenFragment" />
+    <fragment
+        android:id="@+id/eip20ApproveFragment"
+        android:name="com.payfunds.wallet.modules.eip20approve.Eip20ApproveFragment" />
+    <fragment
+        android:id="@+id/eip20RevokeTransactionSettingsFragment"
+        android:name="com.payfunds.wallet.modules.eip20revoke.Eip20RevokeTransactionSettingsFragment" />
+    <fragment
+        android:id="@+id/eip20RevokeConfirmFragment"
+        android:name="com.payfunds.wallet.modules.eip20revoke.Eip20RevokeConfirmFragment" />
+    <fragment
+        android:id="@+id/eip20ApproveConfirmFragment"
+        android:name="com.payfunds.wallet.modules.eip20approve.Eip20ApproveConfirmFragment" />
+    <fragment
+        android:id="@+id/eip20ApproveTransactionSettingsFragment"
+        android:name="com.payfunds.wallet.modules.eip20approve.Eip20ApproveTransactionSettingsFragment" />
+    <fragment
+        android:id="@+id/marketSearchFragment"
+        android:name="com.payfunds.wallet.modules.market.search.MarketSearchFragment" />
+    <fragment
+        android:id="@+id/marketPlatformFragment"
+        android:name="com.payfunds.wallet.modules.market.platform.MarketPlatformFragment" />
+    <fragment
+        android:id="@+id/marketAdvancedSearchFragment"
+        android:name="com.payfunds.wallet.modules.market.filters.MarketFiltersFragment" />
+    <fragment
+        android:id="@+id/blockchainsSelectorFragment"
+        android:name="com.payfunds.wallet.modules.market.filters.BlockchainsSelectorFragment" />
+    <fragment
+        android:id="@+id/marketTopNftCollectionsFragment"
+        android:name="com.payfunds.wallet.modules.market.topnftcollections.TopNftCollectionsFragment" />
+    <fragment
+        android:id="@+id/marketCategoryFragment"
+        android:name="com.payfunds.wallet.modules.market.category.MarketCategoryFragment" />
+    <fragment
+        android:id="@+id/marketAdvancedSearchResultsFragment"
+        android:name="com.payfunds.wallet.modules.market.filtersresult.MarketFiltersResultsFragment" />
+    <fragment
+        android:id="@+id/marketSignalsFragment"
+        android:name="com.payfunds.wallet.modules.market.favorites.MarketSignalsFragment" />
+    <fragment
+        android:id="@+id/createAccountFragment"
+        android:name="com.payfunds.wallet.modules.createaccount.CreateAccountFragment" />
+    <fragment
+        android:id="@+id/restoreAccountFragment"
+        android:name="com.payfunds.wallet.modules.restoreaccount.RestoreAccountFragment" />
+    <fragment
+        android:id="@+id/importCexAccountFragment"
+        android:name="com.payfunds.wallet.modules.importcexaccount.ImportCexAccountFragment" />
+    <fragment
+        android:id="@+id/importWalletFragment"
+        android:name="com.payfunds.wallet.modules.importwallet.ImportWalletFragment" />
+    <fragment
+        android:id="@+id/restoreLocalFragment"
+        android:name="com.payfunds.wallet.modules.restorelocal.RestoreLocalFragment" />
+    <fragment
+        android:id="@+id/watchAddressFragment"
+        android:name="com.payfunds.wallet.modules.watchaddress.WatchAddressFragment" />
+    <fragment
+        android:id="@+id/selectBlockchainsFragment"
+        android:name="com.payfunds.wallet.modules.watchaddress.selectblockchains.SelectBlockchainsFragment" />
+    <fragment
+        android:id="@+id/zcashConfigure"
+        android:name="com.payfunds.wallet.modules.zcashconfigure.ZcashConfigure" />
+    <fragment
+        android:id="@+id/receiveFragment"
+        android:name="com.payfunds.wallet.modules.receive.ReceiveFragment" />
+    <fragment
+        android:id="@+id/evmNetworkFragment"
+        android:name="com.payfunds.wallet.modules.evmnetwork.EvmNetworkFragment"
+        android:label="EvmNetworkFragment" />
+    <fragment
+        android:id="@+id/solanaNetworkFragment"
+        android:name="com.payfunds.wallet.modules.solananetwork.SolanaNetworkFragment"
+        android:label="SolanaNetworkFragment" />
+    <fragment
+        android:id="@+id/btcBlockchainSettingsFragment"
+        android:name="com.payfunds.wallet.modules.btcblockchainsettings.BtcBlockchainSettingsFragment" />
+    <fragment
+        android:id="@+id/tvlFragment"
+        android:name="com.payfunds.wallet.modules.market.tvl.TvlFragment" />
+    <fragment
+        android:id="@+id/etfFragment"
+        android:name="com.payfunds.wallet.modules.market.etf.EtfFragment" />
+    <fragment
+        android:id="@+id/nftsFragment"
+        android:name="com.payfunds.wallet.modules.nft.holdings.NftHoldingsFragment" />
+    <fragment
+        android:id="@+id/nftAssetFragment"
+        android:name="com.payfunds.wallet.modules.nft.asset.NftAssetFragment" />
+    <fragment
+        android:id="@+id/nftSendFragment"
+        android:name="com.payfunds.wallet.modules.nft.send.SendNftFragment" />
+    <fragment
+        android:id="@+id/nftCollectionFragment"
+        android:name="com.payfunds.wallet.modules.nft.collection.NftCollectionFragment" />
+    <fragment
+        android:id="@+id/sendXFragment"
+        android:name="com.payfunds.wallet.modules.send.SendFragment" />
+    <fragment
+        android:id="@+id/sendTokenSelectFragment"
+        android:name="com.payfunds.wallet.modules.sendtokenselect.SendTokenSelectFragment" />
+    <fragment
+        android:id="@+id/multiswap"
+        android:name="com.payfunds.wallet.modules.multiswap.SwapFragment" />
+    <fragment
+        android:id="@+id/swapSelectProvider"
+        android:name="com.payfunds.wallet.modules.multiswap.SwapSelectProviderFragment" />
+    <fragment
+        android:id="@+id/swapSettings"
+        android:name="com.payfunds.wallet.modules.multiswap.settings.SwapSettingsFragment" />
+    <fragment
+        android:id="@+id/swapTransactionSettings"
+        android:name="com.payfunds.wallet.modules.multiswap.settings.SwapTransactionSettingsFragment" />
+    <fragment
+        android:id="@+id/swapConfirm"
+        android:name="com.payfunds.wallet.modules.multiswap.SwapConfirmFragment" />
+
+    <fragment
+        android:id="@+id/swapTokenConfirm"
+        android:name="com.payfunds.wallet.modules.swap.SwapTokenConfirmFragment" />
+
+    <fragment
+        android:id="@+id/sendConfirmation"
+        android:name="com.payfunds.wallet.modules.send.SendConfirmationFragment" />
+    <fragment
+        android:id="@+id/feePriorityInfo"
+        android:name="com.payfunds.wallet.modules.info.FeePriorityInfoFragment" />
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="com.payfunds.wallet.modules.contacts.ContactsFragment" />
+    <fragment
+        android:id="@+id/chooseContact"
+        android:name="com.payfunds.wallet.modules.contacts.ChooseContactFragment" />
+    <fragment
+        android:id="@+id/selectContact"
+        android:name="com.payfunds.wallet.modules.transactions.SelectContactFragment" />
+    <fragment
+        android:id="@+id/statusInfoDialog"
+        android:name="com.payfunds.wallet.modules.info.TransactionStatusInfoFragment" />
+    <fragment
+        android:id="@+id/swapSelectCoinFragment"
+        android:name="com.payfunds.wallet.modules.multiswap.SwapSelectCoinFragment" />
+    <fragment
+        android:id="@+id/tokenBalanceFragment"
+        android:name="com.payfunds.wallet.modules.balance.token.TokenBalanceFragment" />
+    <fragment
+        android:id="@+id/cexAssetFragment"
+        android:name="com.payfunds.wallet.modules.balance.cex.asset.CexAssetFragment" />
+    <fragment
+        android:id="@+id/кeyAccountInfoFragment"
+        android:name="com.payfunds.wallet.modules.manageaccount.showextendedkey.KeyAccountInfoFragment" />
+    <dialog
+        android:id="@+id/contactOptionsDialog"
+        android:name="com.payfunds.wallet.modules.settings.about.ContactOptionsDialog" />
+    <dialog
+        android:id="@+id/backupRequiredDialog"
+        android:name="com.payfunds.wallet.modules.manageaccount.dialogs.BackupRequiredDialog" />
+    <dialog
+        android:id="@+id/backupRecoveryPhraseDialog"
+        android:name="com.payfunds.wallet.modules.backupalert.BackupRecoveryPhraseDialog" />
+    <dialog
+        android:id="@+id/errorDisplayDialogFragment"
+        android:name="com.payfunds.wallet.modules.info.ErrorDisplayDialogFragment" />
+    <dialog
+        android:id="@+id/indicatorsAlertDialog"
+        android:name="com.payfunds.wallet.modules.coin.indicators.IndicatorsAlertDialog" />
+    <dialog
+        android:id="@+id/syncErrorDialog"
+        android:name="com.payfunds.wallet.modules.syncerror.SyncErrorDialog" />
+    <dialog
+        android:id="@+id/unlinkConfirmationDialog"
+        android:name="com.payfunds.wallet.modules.unlinkaccount.UnlinkAccountDialog" />
+    <dialog
+        android:id="@+id/feeSettingsInfoDialog"
+        android:name="com.payfunds.wallet.modules.evmfee.FeeSettingsInfoDialog" />
+    <dialog
+        android:id="@+id/maxSlippageInfoDialog"
+        android:name="com.payfunds.wallet.modules.evmfee.MaxSlippageInfoDialog" />
+    <dialog
+        android:id="@+id/proUsersInfoDialog"
+        android:name="com.payfunds.wallet.modules.profeatures.yakauthorization.ProUsersInfoDialog" />
+    <dialog
+        android:id="@+id/proUsersActivateDialog"
+        android:name="com.payfunds.wallet.modules.profeatures.yakauthorization.ProUsersActivateDialog" />
+    <dialog
+        android:id="@+id/confirmDeleteAllPairingsDialog"
+        android:name="com.payfunds.wallet.modules.walletconnect.pairing.ConfirmDeleteAllPairingsDialog" />
+    <dialog
+        android:id="@+id/configuredTokenInfo"
+        android:name="com.payfunds.wallet.modules.configuredtoken.ConfiguredTokenInfoDialog" />
+
+    <!--Wallet Connect-->
+    <fragment
+        android:id="@+id/wcSessionFragment"
+        android:name="com.payfunds.wallet.modules.walletconnect.session.WCSessionFragment" />
+    <fragment
+        android:id="@+id/wcRequestFragment"
+        android:name="com.payfunds.wallet.modules.walletconnect.request.WCRequestFragment" />
+    <fragment
+        android:id="@+id/wcSendEvmTransactionSettings"
+        android:name="com.payfunds.wallet.modules.walletconnect.request.WCEvmTransactionSettingsFragment" />
+    <fragment
+        android:id="@+id/wcListFragment"
+        android:name="com.payfunds.wallet.modules.walletconnect.list.WCListFragment" />
+    <fragment
+        android:id="@+id/tcListFragment"
+        android:name="com.payfunds.wallet.modules.tonconnect.TonConnectMainFragment" />
+    <fragment
+        android:id="@+id/tcSendRequestFragment"
+        android:name="com.payfunds.wallet.modules.tonconnect.TonConnectSendRequestFragment" />
+    <fragment
+        android:id="@+id/tcNewFragment"
+        android:name="com.payfunds.wallet.modules.tonconnect.TonConnectNewFragment" />
+    <fragment
+        android:id="@+id/wcPairingsFragment"
+        android:name="com.payfunds.wallet.modules.walletconnect.pairing.WCPairingsFragment" />
+
+
+    <fragment
+        android:id="@+id/swapFragment"
+        android:name="com.payfunds.wallet.modules.swap.SwapFragment" />
+
+    <fragment
+        android:id="@+id/alertFragment"
+        android:name="com.payfunds.wallet.modules.alert.AlertFragment"
+        android:label="AlertFragment" />
+
+    <dialog
+        android:id="@+id/wcErrorNoAccountFragment"
+        android:name="com.payfunds.wallet.modules.walletconnect.WCErrorNoAccountFragment" />
+    <dialog
+        android:id="@+id/wcAccountTypeNotSupportedDialog"
+        android:name="com.payfunds.wallet.modules.walletconnect.WCAccountTypeNotSupportedDialog" />
+
+
+</navigation>
