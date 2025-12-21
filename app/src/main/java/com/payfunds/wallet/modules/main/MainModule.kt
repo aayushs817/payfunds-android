@@ -70,6 +70,7 @@ object MainModule {
         Home(R.drawable.ic_home_nav, R.string.Home_Title),
         Market(R.drawable.ic_market_24, R.string.Market_Title),
         Transactions(R.drawable.ic_transactions, R.string.Transactions_Title),
+        Bank(R.drawable.ic_bank_24, R.string.Bank_Title),
         Settings(R.drawable.ic_settings, R.string.Settings_Title);
 
         companion object {

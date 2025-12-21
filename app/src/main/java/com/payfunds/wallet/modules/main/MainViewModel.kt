@@ -73,6 +73,7 @@ class MainViewModel(
             listOf(
                 MainNavigation.Home,
                 MainNavigation.Market,
+                MainNavigation.Bank,
                 MainNavigation.Transactions,
                 MainNavigation.Settings,
             )
@@ -80,6 +81,7 @@ class MainViewModel(
             listOf(
                 MainNavigation.Home,
                 MainNavigation.Transactions,
+                MainNavigation.Bank,
                 MainNavigation.Settings,
             )
         }
@@ -278,6 +280,14 @@ class MainViewModel(
                 mainNavItem = item,
                 selected = selected,
                 enabled = transactionsEnabled && !(DashboardObject.isMultiFactor.value?:false),
+            )
+        }
+
+        MainNavigation.Bank -> {
+            MainModule.NavigationViewItem(
+                mainNavItem = item,
+                selected = selected,
+                enabled = true,
             )
         }
 

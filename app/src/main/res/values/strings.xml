@@ -205,6 +205,14 @@
     <string name="Market_FilterSection_NetworkParameters">NETWORK PARAMETERS</string>
     <string name="Market_FilterSection_Indicators">INDICATORS</string>
     <string name="Market_Field_HighestCap">Highest Cap</string>
+    <string name="Bank_Title">Bank</string>
+    <string name="Bank_MyCards">My Cards</string>
+    <string name="Bank_CreateCard">Create Card</string>
+    <string name="Bank_CreateCardSubtitle">Tap to start the card creation process</string>
+    <string name="Bank_CardControl">Card Control</string>
+    <string name="Bank_Deposit">Deposit</string>
+    <string name="Bank_Withdraw">Withdraw</string>
+    <string name="Bank_RecentTransactions">Recent Transactions</string>
     <string name="Market_Field_LowestCap">Lowest Cap</string>
     <string name="Market_Field_HighestVolume">Highest Volume</string>
     <string name="Market_Field_LowestVolume">Lowest Volume</string>

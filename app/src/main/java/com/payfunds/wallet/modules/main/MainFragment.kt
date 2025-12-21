@@ -59,6 +59,7 @@ import com.payfunds.wallet.core.stats.StatEvent
 import com.payfunds.wallet.core.stats.StatPage
 import com.payfunds.wallet.core.stats.stat
 import com.payfunds.wallet.core.stats.statTab
+import com.payfunds.wallet.modules.bank.BankScreen
 import com.payfunds.wallet.modules.balance.ui.BalanceScreen
 import com.payfunds.wallet.modules.main.MainModule.MainNavigation
 import com.payfunds.wallet.modules.manageaccount.dialogs.BackupRequiredDialog
@@ -270,6 +271,7 @@ private fun MainScreen(
                         MainNavigation.Home -> BalanceScreen(fragmentNavController)
                         MainNavigation.Market -> MarketScreen(fragmentNavController)
                         MainNavigation.Transactions -> TransactionsScreen(fragmentNavController, transactionsViewModel)
+                        MainNavigation.Bank -> BankScreen()
                         MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                     }
                 }
