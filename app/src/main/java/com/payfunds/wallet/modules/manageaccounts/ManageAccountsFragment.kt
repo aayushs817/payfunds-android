@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
@@ -78,7 +79,7 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
         viewModel.checkWalletAddress()
     }
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler).statusBarsPadding()) {
         AppBar(
             title = stringResource(R.string.ManageAccounts_Title),
             navigationIcon = { HsBackButton(onClick = { navController.popBackStack() }) },

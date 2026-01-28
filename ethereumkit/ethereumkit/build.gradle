@@ -58,7 +58,7 @@ dependencies {
 
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.65'
 
-    implementation 'com.github.horizontalsystems:hd-wallet-kit-android:a74b51f'
+    implementation 'com.github.horizontalsystems:hd-wallet-kit-android:a74b51f3fef8f91b2774224f2a3aaa7832ffed2e'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
@@ -105,7 +105,7 @@ dependencies {
     // Android Instrumentation Test
     implementation 'androidx.annotation:annotation:1.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.19.1'
+    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.6'
     androidTestImplementation 'com.nhaarman:mockito-kotlin-kt1.1:1.6.0'
 }
 

@@ -456,5 +456,21 @@
         android:id="@+id/wcAccountTypeNotSupportedDialog"
         android:name="com.payfunds.wallet.modules.walletconnect.WCAccountTypeNotSupportedDialog" />
 
+    <fragment
+        android:id="@+id/createCardFragment"
+        android:name="com.payfunds.wallet.modules.bank.CreateBankUserFragment" />
+
+    <fragment
+        android:id="@+id/transactionsFragment"
+        android:name="com.payfunds.wallet.modules.bank.TransactionsFragment" />
+
+    <fragment
+        android:id="@+id/transactionFilterScreenFragment"
+        android:name="com.payfunds.wallet.modules.bank.TransactionFilterScreenFragment" />
+
+    <fragment
+        android:id="@+id/cardControlFragment"
+        android:name="com.payfunds.wallet.modules.bank.CardControlFragment" />
 
 </navigation>
+

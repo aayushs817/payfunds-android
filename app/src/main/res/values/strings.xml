@@ -213,6 +213,12 @@
     <string name="Bank_Deposit">Deposit</string>
     <string name="Bank_Withdraw">Withdraw</string>
     <string name="Bank_RecentTransactions">Recent Transactions</string>
+    <string name="Bank_Error_EnablePolygonUsdt">Please enable USDC polygon first from dashboard</string>
+    <string name="Bank_UserNotPresent">Create User</string>
+    <string name="Bank_UserNotPresentSubtitle">You need to create a user to start using cards</string>
+    <string name="Bank_Status_KycPending">KYC Pending</string>
+    <string name="Bank_Status_KycRejected">KYC Rejected</string>
+    <string name="Bank_KycVerification">KYC Verification</string>
     <string name="Market_Field_LowestCap">Lowest Cap</string>
     <string name="Market_Field_HighestVolume">Highest Volume</string>
     <string name="Market_Field_LowestVolume">Lowest Volume</string>
@@ -2205,6 +2211,7 @@
     <string name="refreshing">Refreshing</string>
     <string name="you_are_guaranteed_to_receive">You are guaranteed to receive: %1$s</string>
     <string name="referral_code">Referral Code</string>
+    <string name="filter">Filter</string>
 
 
 </resources>

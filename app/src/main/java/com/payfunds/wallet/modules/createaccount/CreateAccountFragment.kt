@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -114,7 +115,7 @@ private fun CreateAccountIntroScreen(
     }
 
     Surface(color = ComposeAppTheme.colors.tyler) {
-        Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().statusBarsPadding()) {
             AppBar(
                 title = stringResource(R.string.ManageAccounts_CreateNewWallet),
    /*             menuItems = listOf(

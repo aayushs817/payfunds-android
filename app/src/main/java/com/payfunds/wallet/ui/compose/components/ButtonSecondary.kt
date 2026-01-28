@@ -280,7 +280,7 @@ object SecondaryButtonDefaults {
      * The default min width applied for the [Button].
      * Note that you can override it by applying Modifier.heightIn directly on [Button].
      */
-    val MinHeight = 28.dp
+    val MinHeight = 50.dp
 
     @Composable
     fun buttonColors(

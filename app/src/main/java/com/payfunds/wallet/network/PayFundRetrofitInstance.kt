@@ -5,24 +5,20 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 object PayFundRetrofitInstance {
 
 
     private val BASE_URL = App.appConfigProvider.backendBaseUrl
-    private val SWAP_BASE_URL = "https://bb04746c9fe2.ngrok-free.app/api/v1/swap/"
+    private val HOLO_BANK_BASE_URL = "http://51.112.97.203:5009/api/v1/"
 
     val payFundApi: PayFundApiService by lazy {
         providePayfundApiService(provideRetrofit(provideOkHttpClient()))
     }
 
-    val payFundSwapApi: PayFundApiService by lazy {
-        providePayfundApiService(provideSwapRetrofit(provideOkHttpClient()))
+    val holoBankApi: PayFundApiService by lazy {
+        providePayfundApiService(provideHoloBankRetrofit(provideOkHttpClient()))
     }
 
     private fun providePayfundApiService(retrofit: Retrofit): PayFundApiService =
@@ -34,8 +30,8 @@ object PayFundRetrofitInstance {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private fun provideSwapRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(SWAP_BASE_URL)
+    private fun provideHoloBankRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl(HOLO_BANK_BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

@@ -236,6 +236,10 @@ class CreateAccountViewModel(
                 BlockchainType.Tron,
                 TokenType.Eip20("TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
             ),
+            TokenQuery(
+                BlockchainType.Polygon,
+                TokenType.Eip20("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359")
+            ),
         )
         walletActivator.activateWallets(account, tokenQueries)
     }

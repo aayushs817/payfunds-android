@@ -271,7 +271,7 @@ private fun MainScreen(
                         MainNavigation.Home -> BalanceScreen(fragmentNavController)
                         MainNavigation.Market -> MarketScreen(fragmentNavController)
                         MainNavigation.Transactions -> TransactionsScreen(fragmentNavController, transactionsViewModel)
-                        MainNavigation.Bank -> BankScreen()
+                        MainNavigation.Bank -> BankScreen(fragmentNavController)
                         MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                     }
                 }

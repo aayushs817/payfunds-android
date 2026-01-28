@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
@@ -81,7 +82,7 @@ fun ManageAccountScreen(navController: NavController, accountId: String) {
         viewModel.onClose()
     }
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler).statusBarsPadding()) {
         AppBar(
             title = viewModel.viewState.title,
             navigationIcon = {
