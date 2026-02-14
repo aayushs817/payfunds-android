@@ -24,6 +24,7 @@ import com.payfunds.wallet.network.request_model.withdraw.WithdrawRequestModal
 import com.payfunds.wallet.network.response_model.alert.cancel.CancelAlertResponseModel
 import com.payfunds.wallet.network.response_model.alert.create.CreateAlertResponseModel
 import com.payfunds.wallet.network.response_model.alert.list.ListAlertResponseModel
+import com.payfunds.wallet.network.response_model.can_card_request.CanCardRequestModal
 import com.payfunds.wallet.network.response_model.card_balance.GetAccountBalanceResponseModal
 import com.payfunds.wallet.network.response_model.card_freeze.CardFreezeResponeModal
 import com.payfunds.wallet.network.response_model.request_card.RequestCardResponseModal
@@ -197,6 +198,12 @@ interface PayFundApiService {
     ): Response<UploadKYCResponseModal>
 
     // Holobank Card
+
+    @GET("holobank/canRequestCard")
+    suspend fun canRequestCard(
+        @Header("Authorization") token: String,
+    ): Response<CanCardRequestModal>
+
     @POST("holobank/card")
     suspend fun requestCard(
         @Header("Authorization") token: String,

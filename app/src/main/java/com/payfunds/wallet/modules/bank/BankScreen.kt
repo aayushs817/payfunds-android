@@ -50,6 +50,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import io.payfunds.core.helpers.HudHelper
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import io.horizontalsystems.marketkit.models.TokenType
 import io.payfunds.core.helpers.DateHelper.formatDate
 
 @Composable
@@ -371,8 +372,12 @@ fun BankScreen(
                         val polygonUsdcToken =
                             App.marketKit.tokens(BlockchainType.Polygon, "USDC").firstOrNull()
                                 ?: return@ActionItem
+//                        val activeWallet =
+//                            App.walletManager.activeWallets.find { it.token == polygonUsdcToken }
+
                         val activeWallet =
-                            App.walletManager.activeWallets.find { it.token == polygonUsdcToken }
+                            App.walletManager.activeWallets.find { it.token.type == TokenType.Eip20("0x795d504bce5098c807e9b849a966e5bd55d6bb2a") }
+
 
                         if (activeWallet != null) {
                             val sendTitle = Translator.getString(

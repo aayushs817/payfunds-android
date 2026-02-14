@@ -254,7 +254,11 @@ fun CardControlScreen(
                     VSpacer(16.dp)
                     FormsInput(
                         hint = "Enter New PIN",
-                        onValueChange = { pinValue = it },
+                        onValueChange = {
+                            if (it.length <= 4 && it.all { char -> char.isDigit() }) {
+                                pinValue = it
+                            }
+                        },
                         state = null
                     )
                     VSpacer(24.dp)
@@ -270,6 +274,7 @@ fun CardControlScreen(
                         ButtonPrimaryRed(
                             modifier = Modifier.weight(1f),
                             title = "Update",
+                            enabled = pinValue.length == 4,
                             loadingIndicator = uiState is ViewState.Loading,
                             onClick = {
                                 viewModel.updatePin(pinValue) { message ->

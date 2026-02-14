@@ -11741,3 +11741,5 @@ INSERT INTO Coin VALUES('keyboard-cat-base','Keyboard Cat (Base)','KEYCAT',721,'
 INSERT INTO Coin VALUES('router-protocol-2','Router Protocol','ROUTE',941,'router-protocol-2','https://assets.coingecko.com/coins/images/39474/large/router.jpg');
 INSERT INTO Coin VALUES('hehecat','hehe','HEHE',1177,'hehecat','https://assets.coingecko.com/coins/images/39164/large/LOGO.png');
 INSERT INTO Coin VALUES('lemonrocks','Lemonrocks','LEMON',1514,'lemonrocks','https://assets.coingecko.com/coins/images/50291/large/Lemonrocks.png');
+INSERT INTO Coin VALUES('tusdc-polygon','TUSDC','TUSDC',null,null,null);
+INSERT INTO TokenEntity VALUES('tusdc-polygon','polygon-pos','eip20',6,'0x795d504bce5098c807e9b849a966e5bd55d6bb2a');
