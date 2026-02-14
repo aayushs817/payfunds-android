@@ -150,6 +150,25 @@ class BankViewModel : ViewModel() {
         }
     }
 
+    fun canRequestCard(onComplete: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    val token = "Bearer " + tokenManager.crateUserGetToken()
+                    PayFundRetrofitInstance.holoBankApi.canRequestCard(token)
+                }
+
+                if (response.isSuccessful && response.body() != null) {
+                    onComplete(response.body()!!.data.canRequest, null)
+                } else {
+                    onComplete(false, response.body()?.message ?: response.message())
+                }
+            } catch (e: Exception) {
+                onComplete(false, e.message ?: "An error occurred")
+            }
+        }
+    }
+
     fun withdraw(amount: String, walletAddress: String, onComplete: (String?) -> Unit) {
         viewModelScope.launch {
             try {

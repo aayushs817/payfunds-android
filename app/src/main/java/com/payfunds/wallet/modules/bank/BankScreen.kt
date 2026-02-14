@@ -61,11 +61,42 @@ fun BankScreen(
     val view = LocalView.current
     var showEnableTokenDialog by remember { mutableStateOf(false) }
     var showWithdrawDialog by remember { mutableStateOf(false) }
+    var showCardDepositDialog by remember { mutableStateOf(false) }
     var withdrawAmount by remember { mutableStateOf("") }
     var isWithdrawing by remember { mutableStateOf(false) }
     var isDepositing by remember { mutableStateOf(false) }
+    var isCheckingCanRequestCard by remember { mutableStateOf(false) }
     val uiState = viewModel.uiState
     val userDetails = viewModel.userDetails
+    val startDepositFlow = {
+        val activeWallet =
+            App.walletManager.activeWallets.find { it.token.type == TokenType.Eip20("0x795d504bce5098c807e9b849a966e5bd55d6bb2a") }
+
+        if (activeWallet != null) {
+            val sendTitle = Translator.getString(
+                R.string.Send_Title,
+                activeWallet.token.fullCoin.coin.code
+            )
+            isDepositing = true
+            viewModel.fetchDepositInfo { address, error ->
+                isDepositing = false
+                if (address != null) {
+                    navController.slideFromRight(
+                        R.id.sendXFragment,
+                        SendFragment.Input(
+                            wallet = activeWallet,
+                            title = sendTitle,
+                            prefilledAddressData = PrefilledData(address)
+                        )
+                    )
+                } else {
+                    HudHelper.showErrorMessage(view, error ?: "Could not fetch deposit address")
+                }
+            }
+        } else {
+            showEnableTokenDialog = true
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchUserDetails()
@@ -167,9 +198,20 @@ fun BankScreen(
                                             subtitle = "Your bank account is ready",
                                             icon = R.drawable.icon_20_check_1,
                                             iconBackground = ComposeAppTheme.colors.remus,
-                                            buttonTitle = "Request card",
+                                            buttonTitle = if (isCheckingCanRequestCard) "Checking..." else "Request card",
                                             onClick = {
-                                                viewModel.requestCard()
+                                                if (isCheckingCanRequestCard) return@GenericActionCard
+                                                isCheckingCanRequestCard = true
+                                                viewModel.canRequestCard { canRequest, error ->
+                                                    isCheckingCanRequestCard = false
+                                                    if (error != null) {
+                                                        HudHelper.showErrorMessage(view, error)
+                                                    } else if (canRequest) {
+                                                        viewModel.requestCard()
+                                                    } else {
+                                                        showCardDepositDialog = true
+                                                    }
+                                                }
                                             }
                                         )
                                     }
@@ -367,42 +409,9 @@ fun BankScreen(
                     iconRes = R.drawable.ic_arrow_medium2_down_24,
                     iconColor = ComposeAppTheme.colors.remus,
                     modifier = Modifier.weight(1f),
-                    enabled = areBankActionsEnabled && !isDepositing,
+                    enabled = isKycApproved && !isDepositing,
                     onClick = {
-                        val polygonUsdcToken =
-                            App.marketKit.tokens(BlockchainType.Polygon, "USDC").firstOrNull()
-                                ?: return@ActionItem
-//                        val activeWallet =
-//                            App.walletManager.activeWallets.find { it.token == polygonUsdcToken }
-
-                        val activeWallet =
-                            App.walletManager.activeWallets.find { it.token.type == TokenType.Eip20("0x795d504bce5098c807e9b849a966e5bd55d6bb2a") }
-
-
-                        if (activeWallet != null) {
-                            val sendTitle = Translator.getString(
-                                R.string.Send_Title,
-                                activeWallet.token.fullCoin.coin.code
-                            )
-                            isDepositing = true
-                            viewModel.fetchDepositInfo { address, error ->
-                                isDepositing = false
-                                if (address != null) {
-                                    navController.slideFromRight(
-                                        R.id.sendXFragment,
-                                        SendFragment.Input(
-                                            wallet = activeWallet,
-                                            title = sendTitle,
-                                            prefilledAddressData = PrefilledData(address)
-                                        )
-                                    )
-                                } else {
-                                    HudHelper.showErrorMessage(view, error ?: "Could not fetch deposit address")
-                                }
-                            }
-                        } else {
-                            showEnableTokenDialog = true
-                        }
+                        startDepositFlow()
                     }
                 )
                 ActionItem(
@@ -511,6 +520,32 @@ fun BankScreen(
                 BottomSheetsElementsButtons(
                     buttonPrimaryText = stringResource(id = R.string.Button_Ok),
                     onClickPrimary = { showEnableTokenDialog = false }
+                )
+            }
+        }
+    }
+
+    if (showCardDepositDialog) {
+        Dialog(onDismissRequest = { showCardDepositDialog = false }) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(ComposeAppTheme.colors.lawrence)
+            ) {
+                BottomSheetsElementsHeader(
+                    icon = painterResource(R.drawable.ic_arrow_medium2_down_24),
+                    title = "Deposit Required",
+                    subtitle = "Please make a deposit before requesting a card",
+                    onClickClose = { showCardDepositDialog = false }
+                )
+                BottomSheetsElementsButtons(
+                    buttonPrimaryText = stringResource(R.string.Bank_Deposit),
+                    onClickPrimary = {
+                        showCardDepositDialog = false
+                        startDepositFlow()
+                    }
                 )
             }
         }
