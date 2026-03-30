@@ -48,6 +48,7 @@ android {
         resValue "string", "walletConnectAppMetaDataIcon", "https://raw.githubusercontent.com/payfunds/HS-Design/master/PressKit/UW-AppIcon-on-light.png"
         resValue "string", "walletConnectAppMetaDataName", "PayFunds"
         resValue "string", "walletConnectAppMetaDataUrl", "payfunds.money"
+        resValue "string", "cardBackendBaseUrl", "https://card-backend.payfunds.com/api/v1/"
     }
 
     buildFeatures {
@@ -109,7 +110,7 @@ android {
             resValue "string", "zendeskClientId", "mobile_sdk_client_8e3aa218957084d80a05"
             resValue "string", "coinApiKey", "02adc6c8-a310-42ff-990a-f2188a4ee08d"
             resValue "string", "routerAddress", "0x1A1E22A4979aEDfdE558e7A76f2429178982e1F0"
-            resValue "string", "rpcUrl", "https://polygon.llamarpc.com/"
+            resValue "string", "rpcUrl", "https://polygon.drpc.org"
         }
 
         appcenterdebug {
@@ -155,7 +156,7 @@ android {
             resValue "string", "zendeskClientId", "mobile_sdk_client_8e3aa218957084d80a05"
             resValue "string", "coinApiKey", "02adc6c8-a310-42ff-990a-f2188a4ee08d"
             resValue "string", "routerAddress", "0x1A1E22A4979aEDfdE558e7A76f2429178982e1F0"
-            resValue "string", "rpcUrl", "https://polygon.llamarpc.com/"
+            resValue "string", "rpcUrl", "https://polygon.drpc.org"
             signingConfig signingConfigs.appCenter
         }
 

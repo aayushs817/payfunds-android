@@ -38,6 +38,10 @@ class AppConfigProvider(localStorage: ILocalStorage) {
         Translator.getString(R.string.backendBaseUrl)
     }
 
+    val cardBackendBaseUrl by lazy {
+        Translator.getString(R.string.cardBackendBaseUrl)
+    }
+
     val zendeskUrl by lazy {
         Translator.getString(R.string.zendeskUrl)
     }

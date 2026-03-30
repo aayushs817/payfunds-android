@@ -116,12 +116,11 @@ class AdapterFactory(
     private fun getAdapter(wallet: Wallet) = when (val tokenType = wallet.token.type) {
         is TokenType.Derived -> {
             when (wallet.token.blockchainType) {
-                BlockchainType.Bitcoin -> null
-//                    {
-//                    val syncMode =
-//                        btcBlockchainManager.syncMode(BlockchainType.Bitcoin, wallet.account.origin)
-//                    BitcoinAdapter(wallet, syncMode, backgroundManager, tokenType.derivation)
-//                }
+                BlockchainType.Bitcoin -> {
+                    val syncMode =
+                        btcBlockchainManager.syncMode(BlockchainType.Bitcoin, wallet.account.origin)
+                    BitcoinAdapter(wallet, syncMode, backgroundManager, tokenType.derivation)
+                }
 
                 BlockchainType.Litecoin -> {
                     val syncMode = btcBlockchainManager.syncMode(

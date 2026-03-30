@@ -51,8 +51,23 @@ class EvmSyncSourceManager(
             BlockchainType.Ethereum -> listOf(
                 evmSyncSource(
                     blockchainType,
-                    "LlamaNodes",
-                    RpcSource.Http(listOf(URI("https://eth.llamarpc.com")), null),
+                    "DRPC",
+                    RpcSource.Http(
+                        listOf(URI("https://eth.drpc.org")),
+                        null
+                    ),
+                    defaultTransactionSource(blockchainType)
+                ),
+                evmSyncSource(
+                    blockchainType,
+                    "1RPC",
+                    RpcSource.Http(listOf(URI("https://1rpc.io/eth")), null),
+                    defaultTransactionSource(blockchainType)
+                ),
+                evmSyncSource(
+                    blockchainType,
+                    "MeowRPC",
+                    RpcSource.Http(listOf(URI("https://eth.meowrpc.com")), null),
                     defaultTransactionSource(blockchainType)
                 )
             )
@@ -84,14 +99,23 @@ class EvmSyncSourceManager(
             BlockchainType.Polygon -> listOf(
                 evmSyncSource(
                     blockchainType,
-                    "Polygon RPC",
-                    RpcSource.polygonRpcHttp(),
+                    "Custom RPC",
+                    RpcSource.Http(
+                        listOf(URI(appConfigProvider.rpcUrl)),
+                        null
+                    ),
                     defaultTransactionSource(blockchainType)
                 ),
                 evmSyncSource(
                     blockchainType,
-                    "LlamaNodes",
-                    RpcSource.Http(listOf(URI("https://polygon.llamarpc.com")), null),
+                    "1RPC",
+                    RpcSource.Http(listOf(URI("https://1rpc.io/matic")), null),
+                    defaultTransactionSource(blockchainType)
+                ),
+                evmSyncSource(
+                    blockchainType,
+                    "MaticVigil",
+                    RpcSource.Http(listOf(URI("https://rpc-mainnet.maticvigil.com")), null),
                     defaultTransactionSource(blockchainType)
                 )
             )

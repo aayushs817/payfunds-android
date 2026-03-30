@@ -11,7 +11,7 @@ object PayFundRetrofitInstance {
 
 
     private val BASE_URL = App.appConfigProvider.backendBaseUrl
-    private val HOLO_BANK_BASE_URL = "http://51.112.97.203:5009/api/v1/"
+    private val HOLO_BANK_BASE_URL = App.appConfigProvider.cardBackendBaseUrl
 
     val payFundApi: PayFundApiService by lazy {
         providePayfundApiService(provideRetrofit(provideOkHttpClient()))
