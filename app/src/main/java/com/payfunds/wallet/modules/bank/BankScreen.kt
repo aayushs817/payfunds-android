@@ -1,5 +1,6 @@
 package com.payfunds.wallet.modules.bank
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -68,6 +69,7 @@ fun BankScreen(
     var isCheckingCanRequestCard by remember { mutableStateOf(false) }
     val uiState = viewModel.uiState
     val userDetails = viewModel.userDetails
+
     val startDepositFlow = {
         val activeWallet =
             App.walletManager.activeWallets.find { it.token.type == TokenType.Eip20("0x795d504bce5098c807e9b849a966e5bd55d6bb2a") }
@@ -79,6 +81,7 @@ fun BankScreen(
             )
             isDepositing = true
             viewModel.fetchDepositInfo { address, error ->
+                Log.d("BankScreen", "fetchDepositInfo: $address, $error")
                 isDepositing = false
                 if (address != null) {
                     navController.slideFromRight(
@@ -93,6 +96,17 @@ fun BankScreen(
                     HudHelper.showErrorMessage(view, error ?: "Could not fetch deposit address")
                 }
             }
+        } else {
+            showEnableTokenDialog = true
+        }
+    }
+
+    val startWithdrawFlow = {
+        val activeWallet =
+            App.walletManager.activeWallets.find { it.token.type == TokenType.Eip20("0x795d504bce5098c807e9b849a966e5bd55d6bb2a") }
+
+        if (activeWallet != null) {
+            showWithdrawDialog = true
         } else {
             showEnableTokenDialog = true
         }
@@ -419,20 +433,10 @@ fun BankScreen(
                     iconRes = R.drawable.ic_arrow_medium2_up_24,
                     iconColor = ComposeAppTheme.colors.jacob,
                     modifier = Modifier.weight(1f),
-                    // enabled = areBankActionsEnabled,
+                   // enabled = areBankActionsEnabled,
                     enabled = false,
                     onClick = {
-                        val polygonUsdcToken =
-                            App.marketKit.tokens(BlockchainType.Polygon, "USDC").firstOrNull()
-                                ?: return@ActionItem
-                        val activeWallet =
-                            App.walletManager.activeWallets.find { it.token == polygonUsdcToken }
-
-                        if (activeWallet != null) {
-                            showWithdrawDialog = true
-                        } else {
-                            showEnableTokenDialog = true
-                        }
+                       startWithdrawFlow()
                     }
                 )
             }
