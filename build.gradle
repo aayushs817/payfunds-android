@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        compile_sdk_version = 36
+        compile_sdk_version = 35
         min_sdk_version = 27
         lifecycle_version = '2.7.0'
 
@@ -32,7 +32,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.4.0'
+        classpath 'com.android.tools.build:gradle:8.7.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.2'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.1'

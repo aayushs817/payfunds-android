@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material3.DatePicker
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
@@ -117,7 +119,7 @@ fun CreateCardScreen(
     var nationality by remember { mutableStateOf("") }
     var dateOfBirth by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
-    var idDocumentType by remember { mutableStateOf("") }
+    var idDocumentType by remember { mutableStateOf("Passport") }
     var idDocumentNumber by remember { mutableStateOf("") }
     var idDocumentIssueDate by remember { mutableStateOf("") }
     var idDocumentExpiryDate by remember { mutableStateOf("") }
@@ -139,6 +141,7 @@ fun CreateCardScreen(
     var personalIdentificationNumber by remember { mutableStateOf("") }
     var isSameResidentialAddress by remember { mutableStateOf(true) }
     val view = LocalView.current
+
 
     LaunchedEffect(uiState) {
         if (uiState is ViewState.Error) {
@@ -164,13 +167,22 @@ fun CreateCardScreen(
 
     fun uriToFile(uri: Uri?, context: Context): File? {
         if (uri == null) return null
-        val file = File(context.cacheDir, "temp_file_${System.currentTimeMillis()}")
-        context.contentResolver.openInputStream(uri)?.use { input ->
+        val contentResolver = context.contentResolver
+        val type = contentResolver.getType(uri)
+        val extension = when (type) {
+            "image/jpeg" -> ".jpg"
+            "image/png" -> ".png"
+            "image/webp" -> ".webp"
+            else -> ".jpg"
+        }
+        val file = File(context.cacheDir, "kyc_image_${System.currentTimeMillis()}$extension")
+        val inputStream = contentResolver.openInputStream(uri) ?: return null
+        inputStream.use { input ->
             file.outputStream().use { output ->
                 input.copyTo(output)
             }
         }
-        return file
+        return file.takeIf { it.exists() && it.length() > 0L }
     }
 
     var showGenderSelector by remember { mutableStateOf(false) }
@@ -180,7 +192,7 @@ fun CreateCardScreen(
     var showTitleSelector by remember { mutableStateOf(false) }
 
     val genderOptions = listOf("Male", "Female", "Other")
-    val idTypeOptions = listOf("Passport", "Identity Card", "Driver's License")
+    val idTypeOptions = listOf("Passport", "National ID")
     val employmentStatusOptions = listOf("Employed", "Unemployed", "Self-Employed", "Student", "Retired")
     val occupationOptions = listOf("Employee", "Public Staff", "Staff", "General Customer", "Special Customer", "Agent")
     val titleOptions = listOf("Mr.", "Mrs.", "Dr.")
@@ -243,6 +255,26 @@ fun CreateCardScreen(
                     "US"
                 )
         )
+    }
+
+    LaunchedEffect(viewModel.userDetails) {
+        viewModel.userDetails?.data?.let { data ->
+            if (firstName.isEmpty()) {
+                val fullName = data.fullName ?: ""
+                val nameParts = fullName.split(" ", limit = 2)
+                firstName = nameParts.getOrNull(0) ?: ""
+                lastName = nameParts.getOrNull(1) ?: ""
+            }
+            if (email.isEmpty()) email = data.email ?: ""
+            if (phoneNumber.isEmpty()) phoneNumber = data.mobile ?: ""
+
+            val countryCode = data.countryCode
+            if (countryCode != null && selectedCountry.isoCode != countryCode) {
+                allCountries.find { it.isoCode.equals(countryCode, ignoreCase = true) }?.let {
+                    selectedCountry = it
+                }
+            }
+        }
     }
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -373,6 +405,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "First Name")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = firstName,
                             hint = "Enter your first name",
                             pasteEnabled = false,
                             onValueChange = { firstName = it }
@@ -382,6 +415,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Last Name")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = lastName,
                             hint = "Enter your last name",
                             pasteEnabled = false,
                             onValueChange = { lastName = it }
@@ -391,6 +425,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Display Name")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = displayName,
                             hint = "Enter display name",
                             pasteEnabled = false,
                             onValueChange = { displayName = it }
@@ -400,6 +435,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Email")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = email,
                             hint = "Enter your email",
                             pasteEnabled = false,
                             onValueChange = { email = it }
@@ -449,6 +485,7 @@ fun CreateCardScreen(
 
                             Box(modifier = Modifier.weight(1f)) {
                                 FormsInput(
+                                    initial = phoneNumber,
                                     hint = "Enter phone number",
                                     pasteEnabled = false,
                                     onValueChange = { phoneNumber = it }
@@ -512,6 +549,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Nationality")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = nationality,
                             hint = "Enter your nationality",
                             pasteEnabled = false,
                             onValueChange = { nationality = it }
@@ -537,11 +575,37 @@ fun CreateCardScreen(
                         )
 
                         VSpacer(16.dp)
+                        subhead1_grey(text = "Country")
+                        VSpacer(8.dp)
+                        FormsInputSearch(
+                            enabled = false,
+                            hint = selectedCountry.name.ifEmpty { "Select Country" },
+                            hintColor = if (selectedCountry.name.isEmpty()) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.leah,
+                            onValueChange = {},
+                            endContent = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_arrow_down),
+                                    contentDescription = null,
+                                    tint = ComposeAppTheme.colors.grey,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            modifier = Modifier.clickable { coroutineScope.launch { sheetState.show() } }
+                        )
+
+                        VSpacer(16.dp)
                         subhead1_grey(text = "Personal Identification Number")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = personalIdentificationNumber,
                             hint = "Enter identification number",
                             pasteEnabled = false,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            textPreprocessor = object : TextPreprocessor {
+                                override fun process(text: String): String {
+                                    return text.filter { it in '0'..'9' }
+                                }
+                            },
                             onValueChange = { personalIdentificationNumber = it }
                         )
 
@@ -549,6 +613,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Place of Birth")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = placeOfBirth,
                             hint = "Enter your place of birth",
                             pasteEnabled = false,
                             onValueChange = { placeOfBirth = it }
@@ -558,6 +623,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Residential Address")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = address,
                             hint = "Enter your residential address",
                             pasteEnabled = false,
                             onValueChange = { address = it }
@@ -567,6 +633,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "District")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = district,
                             hint = "Enter your district",
                             pasteEnabled = false,
                             onValueChange = { district = it }
@@ -576,6 +643,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "City")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = city,
                             hint = "Enter your city",
                             pasteEnabled = false,
                             onValueChange = { city = it }
@@ -585,6 +653,7 @@ fun CreateCardScreen(
                         subhead1_grey(text = "Postal Code")
                         VSpacer(8.dp)
                         FormsInput(
+                            initial = postalCode,
                             hint = "Enter your postal code",
                             pasteEnabled = false,
                             onValueChange = { postalCode = it }
@@ -609,40 +678,64 @@ fun CreateCardScreen(
                             modifier = Modifier.clickable { showDatePickerForDOB = true }
                         )
 
+                        VSpacer(16.dp)
+                        subhead1_grey(text = "ID Document Type")
+                        VSpacer(8.dp)
+                        FormsInputSearch(
+                            enabled = false,
+                            hint = idDocumentType.ifEmpty { "Select ID Document Type" },
+                            hintColor = if (idDocumentType.isEmpty()) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.leah,
+                            onValueChange = {},
+                            endContent = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_arrow_down),
+                                    contentDescription = null,
+                                    tint = ComposeAppTheme.colors.grey,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            modifier = Modifier.clickable { showIdTypeSelector = true }
+                        )
+
                         VSpacer(24.dp)
                         headline1_leah(text = "Identity Documents")
                         VSpacer(16.dp)
 
-                        subhead1_grey(text = "Passport Image")
-                        VSpacer(8.dp)
-                        FormsUploadItem(
-                            text = idDocumentFrontUri?.path?.split("/")?.lastOrNull() ?: "Tap to upload Passport Image",
-                            onClick = { idFrontLauncher.launch("image/*") }
-                        )
+                        if (idDocumentType == "Passport") {
+                            subhead1_grey(text = "Passport Image")
+                            VSpacer(8.dp)
+                            FormsUploadItem(
+                                text = idDocumentFrontUri?.path?.split("/")?.lastOrNull()
+                                    ?: "Tap to upload Passport Image",
+                                onClick = { idFrontLauncher.launch("image/*") }
+                            )
 
-                        VSpacer(16.dp)
-                        subhead1_grey(text = "National ID Image")
-                        VSpacer(8.dp)
-                        FormsUploadItem(
-                            text = idDocumentBackUri?.path?.split("/")?.lastOrNull() ?: "Tap to upload National ID Image",
-                            onClick = { idBackLauncher.launch("image/*") }
-                        )
+                            VSpacer(16.dp)
+                            subhead1_grey(text = "Passport Selfie")
+                            VSpacer(8.dp)
+                            FormsUploadItem(
+                                text = passportSelfieUri?.path?.split("/")?.lastOrNull()
+                                    ?: "Tap to upload Passport Selfie",
+                                onClick = { passportSelfieLauncher.launch("image/*") }
+                            )
+                        } else if (idDocumentType.isNotEmpty()) {
+                            subhead1_grey(text = "National ID Image")
+                            VSpacer(8.dp)
+                            FormsUploadItem(
+                                text = idDocumentBackUri?.path?.split("/")?.lastOrNull()
+                                    ?: "Tap to upload National ID Image",
+                                onClick = { idBackLauncher.launch("image/*") }
+                            )
 
-                        VSpacer(16.dp)
-                        subhead1_grey(text = "Passport Selfie")
-                        VSpacer(8.dp)
-                        FormsUploadItem(
-                            text = passportSelfieUri?.path?.split("/")?.lastOrNull() ?: "Tap to upload Passport Selfie",
-                            onClick = { passportSelfieLauncher.launch("image/*") }
-                        )
-
-                        VSpacer(16.dp)
-                        subhead1_grey(text = "National ID Selfie")
-                        VSpacer(8.dp)
-                        FormsUploadItem(
-                            text = nationalIdSelfieUri?.path?.split("/")?.lastOrNull() ?: "Tap to upload National ID Selfie",
-                            onClick = { nationalIdSelfieLauncher.launch("image/*") }
-                        )
+                            VSpacer(16.dp)
+                            subhead1_grey(text = "National ID Selfie")
+                            VSpacer(8.dp)
+                            FormsUploadItem(
+                                text = nationalIdSelfieUri?.path?.split("/")?.lastOrNull()
+                                    ?: "Tap to upload National ID Selfie",
+                                onClick = { nationalIdSelfieLauncher.launch("image/*") }
+                            )
+                        }
 
                         VSpacer(16.dp)
                         subhead1_grey(text = "Digital Signature")
@@ -664,9 +757,43 @@ fun CreateCardScreen(
                             onClick = {
                                 Log.d("KYC_DEBUG", "Submit Button Clicked - Type: ${selectedVerificationType}")
                                 if (selectedVerificationType == VerificationType.KYC) {
-                                    Log.d("KYC_DEBUG", "Submitting KYC with fields: title=$title, firstName=$firstName, lastName=$lastName")
+                                    val passportImageFile = uriToFile(idDocumentFrontUri, context)
+                                    val nationalIdImageFile = uriToFile(idDocumentBackUri, context)
+                                    val passportSelfieFile = uriToFile(passportSelfieUri, context)
+                                    val nationalIdSelfieImageFile = uriToFile(nationalIdSelfieUri, context)
+                                    val digitalSignatureFile = uriToFile(digitalSignatureUri, context)
+
+                                    val isPassport = idDocumentType == "Passport"
+                                    val isNationalId = idDocumentType == "National ID"
+
+                                    Log.d("KYC_DEBUG", "Validation: idDocumentType=$idDocumentType, signature=${digitalSignatureFile != null}, passportFront=${passportImageFile != null}, passportSelfie=${passportSelfieFile != null}, nationalIdBack=${nationalIdImageFile != null}, nationalIdSelfie=${nationalIdSelfieImageFile != null}")
+
+                                    val hasRequiredImages = (when {
+                                        isPassport -> passportImageFile != null && passportSelfieFile != null
+                                        isNationalId -> nationalIdImageFile != null && nationalIdSelfieImageFile != null
+                                        else -> false
+                                    }) && digitalSignatureFile != null
+
+                                    if (!hasRequiredImages) {
+                                        val errorMsg = when {
+                                            idDocumentType.isEmpty() -> "Please select ID Document Type"
+                                            digitalSignatureFile == null -> "Please upload digital signature"
+                                            isPassport -> "Please upload Passport Image and Selfie"
+                                            isNationalId -> "Please upload National ID Image and Selfie"
+                                            else -> "Please upload required documents"
+                                        }
+                                        Log.e("KYC_DEBUG", "Validation Failed: $errorMsg")
+                                        HudHelper.showErrorMessage(view, errorMsg)
+                                        return@ButtonPrimaryRed
+                                    }
+
+                                   
+
+                                    Log.d("KYC_DEBUG", "Validation Passed. Calling uploadKYC...")
                                     viewModel.uploadKYC(
                                         title = title,
+                                        firstName = firstName,
+                                        lastName = lastName,
                                         nationality = nationality,
                                         occupation = occupation,
                                         dateOfBirth = dateOfBirth,
@@ -677,15 +804,18 @@ fun CreateCardScreen(
                                         city = city,
                                         postalCode = postalCode,
                                         isSameResidentialAddress = isSameResidentialAddress,
-                                        personalIdentificationNumber = personalIdentificationNumber.toIntOrNull() ?: 0,
-                                        passportImageFile = uriToFile(idDocumentFrontUri, context),
-                                        nationalIdImageFile = uriToFile(idDocumentBackUri, context),
-                                        passportSelfieFile = uriToFile(passportSelfieUri, context),
-                                        nationalIdSelfieImageFile = uriToFile(nationalIdSelfieUri, context),
-                                        digitalSignatureFile = uriToFile(digitalSignatureUri, context)
-                                    ) {
-                                        showSuccessDialog = true
-                                    }
+                                        personalIdentificationNumber = personalIdentificationNumber.trim(),
+                                        passportImageFile = passportImageFile,
+                                        nationalIdImageFile = nationalIdImageFile,
+                                        passportSelfieFile = passportSelfieFile,
+                                        nationalIdSelfieImageFile = nationalIdSelfieImageFile,
+                                        digitalSignatureFile = digitalSignatureFile!!,
+                                        onSuccess = {
+                                            Log.d("KYC_DEBUG", "uploadKYC Success!")
+                                            showSuccessDialog = true
+                                        }
+
+                                    )
                                 } else {
                                     // Handle KYB if needed
                                     HudHelper.showErrorMessage(view, "KYB submission not implemented yet")

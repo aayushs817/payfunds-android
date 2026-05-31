@@ -179,6 +179,8 @@ interface PayFundApiService {
     suspend fun uploadKYC(
         @Header("Authorization") token: String,
         @Part("title") title: RequestBody,
+        @Part("firstName") firstName: RequestBody,
+        @Part("lastName") lastName: RequestBody,
         @Part("nationality") nationality: RequestBody,
         @Part("occupation") occupation: RequestBody,
         @Part("dateOfBirth") dateOfBirth: RequestBody,
@@ -190,10 +192,10 @@ interface PayFundApiService {
         @Part("postalCode") postalCode: RequestBody,
         @Part("isSameResidentialAddress") isSameResidentialAddress: RequestBody,
         @Part("personalIdentificationNumber") personalIdentificationNumber: RequestBody,
-        @Part passportImage: MultipartBody.Part,
-        @Part nationalIdImage: MultipartBody.Part,
-        @Part passportSelfie: MultipartBody.Part,
-        @Part nationalIdSelfieImage: MultipartBody.Part,
+        @Part passportImage: MultipartBody.Part?,
+        @Part nationalIdImage: MultipartBody.Part?,
+        @Part passportSelfie: MultipartBody.Part?,
+        @Part nationalIdSelfieImage: MultipartBody.Part?,
         @Part digitalSignature: MultipartBody.Part,
     ): Response<UploadKYCResponseModal>
 
