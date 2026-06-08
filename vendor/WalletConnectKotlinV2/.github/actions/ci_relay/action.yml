@@ -1,0 +1,38 @@
+name: 'Relay Integration Tests'
+description: 'Runs Kotlin SDK integration tests with Relay server'
+
+inputs:
+  SECRETS_PROPERTIES:
+    description: 'Secrets properties file'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        architecture: x86_64
+        cache: 'gradle'
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Fetch Properties File
+      shell: bash
+      env:
+        SECRETS_PROPERTIES: ${{ inputs.SECRETS_PROPERTIES }}
+      run: echo $SECRETS_PROPERTIES | base64 --decode > secrets.properties
+
+    - name: Relay integration tests
+      # TODO: Add SDK_VERSION env var
+      shell: bash
+      run: ./gradlew :foundation:test --tests "com.walletconnect.foundation.RelayTest" -i

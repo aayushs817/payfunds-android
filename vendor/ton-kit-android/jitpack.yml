@@ -1,0 +1,21 @@
+jdk:
+  - openjdk17 # Use a modern JDK for building
+
+before_install:
+  # Ensure JAVA_HOME is set for sdkmanager (JitPack usually handles this, but good to be aware)
+  # - export JAVA_HOME=$JAVA_HOME_17_X64
+
+  # Update sdkmanager to the latest version and accept all licenses
+  # The 'yes |' part automatically answers yes to license prompts.
+  - yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses > /dev/null
+  - $ANDROID_HOME/tools/bin/sdkmanager --update > /dev/null
+
+  # Install necessary platform tools, platforms, and build tools
+  # Match compileSdk (34) and a recent build-tools version from your project
+  - $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+  # Install the specific NDK version your tonkit module needs
+  # This should match the ndkVersion "29.0.14033849" in your tonkit/build.gradle
+  - $ANDROID_HOME/tools/bin/sdkmanager "ndk;29.0.14033849" > /dev/null
+
+install:

@@ -1,0 +1,68 @@
+name: Kotlin Scheduled Integration
+
+on:
+  workflow_dispatch:
+
+env:
+  TEST_TIMEOUT_SECONDS: 40 # Predefined timeout for integration tests
+
+jobs:
+# Copy of ci_relay.yml
+  relay_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Relay CI
+        env:
+          TEST_RELAY_URL: wss://relay.walletconnect.org
+          TEST_PROJECT_ID: ${{ secrets.WC_CLOUD_PROJECT_ID }}
+        with:
+          SECRETS_PROPERTIES: ${{ secrets.SECRETS_PROPERTIES }}
+        uses: ./.github/actions/ci_relay
+
+# Copy of ci_instrumented_test.yml
+#   sdk_tests:
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         conf: [
+#           { name: 'Sign_SDK', command: ":protocol:sign:allDevicesCheck" },
+#           { name: 'Android_Core_SDK', command: ":core:android:allDevicesCheck" },
+#         ]
+
+#     name: ${{ matrix.conf.name }}
+#     runs-on: self-hosted
+#     steps:
+#       - uses: actions/checkout@v3
+
+#       - name: Run instrumented tests
+#         uses: ./.github/actions/ci_instrumented_tests
+#         with:
+#           shouldUseCache: ${{ github.event.inputs.testTimeoutSeconds || true }} # Setting to true faster pass unchanged code
+#           name: ${{ matrix.conf.name }}
+#           command: ${{ matrix.conf.command }}
+#           report: ${{ matrix.conf.report }}
+#           projectId: ${{ secrets.WC_CLOUD_PROJECT_ID }}
+#           testTimeoutSeconds: ${{ github.event.inputs.testTimeoutSeconds || env.TEST_TIMEOUT_SECONDS }} # Prioritise dispatch input timeout over env one
+
+  trigger_slack_webhook:
+    runs-on: ubuntu-latest
+#     needs: [sdk_tests, relay_tests]
+    needs: [relay_tests]
+    if: failure()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "action_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SCHEDULED_CI_WEBHOOK_URL }}

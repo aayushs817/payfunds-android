@@ -1,0 +1,101 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 34
+
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 34
+
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    namespace 'io.horizontalsystems.tools'
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    implementation project(':bitcoincore')
+    implementation project(':bitcoinkit')
+    implementation project(':dashkit')
+    implementation project(':bitcoincashkit')
+    implementation project(':litecoinkit')
+    implementation project(':ecashkit')
+}
+
+// Allow running `fun main()` from the IDE green-arrow.
+// The Android library plugin doesn't create a JVM `main` SourceSet, but the
+// IntelliJ-generated init script for "Run Kotlin main()" expects
+// `project.sourceSets.main.runtimeClasspath`. We provide a shim here that
+// resolves lazily so the classpath is computed at task execution time.
+def kitProjectPaths = [
+        ':tools',
+        ':bitcoincore',
+        ':bitcoinkit',
+        ':bitcoincashkit',
+        ':dashkit',
+        ':litecoinkit',
+        ':ecashkit',
+]
+def kitResourcePaths = [
+        'bitcoinkit/src/main/resources',
+        'bitcoincashkit/src/main/resources',
+        'dashkit/src/main/resources',
+        'litecoinkit/src/main/resources',
+        'ecashkit/src/main/resources',
+]
+
+sourceSets {
+    main {
+        runtimeClasspath = files({
+            def items = []
+
+            // Compiled class dirs from each kit project's release variant.
+            // Adding the FileCollections (not File sets) preserves task deps
+            // so the JavaExec input wiring triggers compilation as needed.
+            kitProjectPaths.each { path ->
+                def p = rootProject.findProject(path)
+                if (p == null) return
+                ['compileReleaseJavaWithJavac', 'compileReleaseKotlin'].each { taskName ->
+                    def t = p.tasks.findByName(taskName)
+                    if (t != null) items.add(t.outputs.files)
+                }
+            }
+
+            // Checkpoint resources live under each kit's src/main/resources.
+            kitResourcePaths.each { rel ->
+                def dir = rootProject.file(rel)
+                if (dir.exists()) items.add(dir)
+            }
+
+            // External JAR dependencies (Kotlin stdlib, etc.) — exclude AARs
+            // and project artifacts since their classes already come from the
+            // compile-task outputs above.
+            def cfg = configurations.findByName('releaseRuntimeClasspath')
+            if (cfg != null) {
+                items.add(cfg.incoming.artifactView {
+                    componentFilter { c ->
+                        !(c instanceof org.gradle.api.artifacts.component.ProjectComponentIdentifier)
+                    }
+                    lenient = true
+                }.files)
+            }
+
+            return items
+        })
+    }
+}

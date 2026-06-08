@@ -1,0 +1,33 @@
+name: Relay Integration Tests
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+
+concurrency:
+  # Support push/pr as event types with different behaviors each:
+  # 1. push: queue up builds by branch
+  # 2. pr: only allow one run per PR
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref_name }}
+  # If there is already a workflow running for the same pull request, cancel it
+  # For non-PR triggers queue up builds
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  integration_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Relay CI
+        env:
+          TEST_RELAY_URL: wss://relay.walletconnect.org
+          TEST_PROJECT_ID: ${{ secrets.WC_CLOUD_PROJECT_ID }}
+          NOTIFY_INTEGRATION_TESTS_PROJECT_ID: ${{ secrets.NOTIFY_INTEGRATION_TESTS_PROJECT_ID }}
+          NOTIFY_INTEGRATION_TESTS_SECRET: ${{ secrets.NOTIFY_INTEGRATION_TESTS_SECRET }}
+        with:
+          SECRETS_PROPERTIES: ${{ secrets.SECRETS_PROPERTIES }}
+        uses: ./.github/actions/ci_relay

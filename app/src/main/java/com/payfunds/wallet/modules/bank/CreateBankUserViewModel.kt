@@ -11,6 +11,7 @@ import com.payfunds.wallet.modules.settings.security.twofactorauth.CrateUserToke
 import com.payfunds.wallet.network.PayFundRetrofitInstance
 import com.payfunds.wallet.network.request_model.create_core_user.CreateCoreUserRequestModal
 import com.payfunds.wallet.network.response_model.create_core_user.CreateCoreUserResponseModal
+import com.payfunds.wallet.network.response_model.get_user_details.GetUserDetailsResponseModal
 import com.google.gson.Gson
 import android.util.Log
 import com.payfunds.wallet.network.response_model.holobank.HolobankErrorResponse
@@ -30,6 +31,9 @@ class CreateBankUserViewModel : ViewModel() {
         private set
 
     var createCoreUserResponse by mutableStateOf<CreateCoreUserResponseModal?>(null)
+        private set
+
+    var userDetails by mutableStateOf<GetUserDetailsResponseModal?>(null)
         private set
 
     private val tokenManager = CrateUserTokenManager(App.instance)
@@ -70,9 +74,10 @@ class CreateBankUserViewModel : ViewModel() {
             }
         }
     }
-
     fun uploadKYC(
         title: String,
+        firstName: String?,
+        lastName: String?,
         nationality: String,
         occupation: String,
         dateOfBirth: String,
@@ -83,96 +88,99 @@ class CreateBankUserViewModel : ViewModel() {
         city: String,
         postalCode: String,
         isSameResidentialAddress: Boolean,
-        personalIdentificationNumber: Int,
+        personalIdentificationNumber: String,
         passportImageFile: File?,
         nationalIdImageFile: File?,
         passportSelfieFile: File?,
         nationalIdSelfieImageFile: File?,
-        digitalSignatureFile: File?,
+        digitalSignatureFile: File,
         onSuccess: () -> Unit
     ) {
-        viewModelScope.launch {
-            uiState = ViewState.Loading
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    val token = "Bearer " + tokenManager.crateUserGetToken()
-                    Log.d("KYC_DEBUG", "uploadKYC: Token retrieved")
-                    
-                    val textType = "text/plain".toMediaTypeOrNull()
-                    val imageType = "image/*".toMediaTypeOrNull()
+    viewModelScope.launch {
+        uiState = ViewState.Loading
+        Log.d("KYC_DEBUG", "uploadKYC started: title=$title, firstName=$firstName, lastName=$lastName")
+        try {
+            val response = withContext(Dispatchers.IO) {
+                val token = "Bearer " + tokenManager.crateUserGetToken()
+                Log.d("KYC_DEBUG", "uploadKYC: Token retrieved")
 
-                    val titlePart = title.toRequestBody(textType)
-                    val nationalityPart = nationality.toRequestBody(textType)
-                    val occupationPart = occupation.toRequestBody(textType)
-                    val dateOfBirthPart = dateOfBirth.toRequestBody(textType)
-                    val placeOfBirthPart = placeOfBirth.toRequestBody(textType)
-                    val countryPart = country.toRequestBody(textType)
-                    val addressPart = address.toRequestBody(textType)
-                    val districtPart = district.toRequestBody(textType)
-                    val cityPart = city.toRequestBody(textType)
-                    val postalCodePart = postalCode.toRequestBody(textType)
-                    val isSameResidentialAddressPart = isSameResidentialAddress.toString().toRequestBody(textType)
-                    val personalIdentificationNumber = personalIdentificationNumber.toString().toRequestBody(textType)
+                val textType = "text/plain".toMediaTypeOrNull()
+                val imageType = "image/*".toMediaTypeOrNull()
 
-                    val passportImagePart = passportImageFile?.let {
-                        MultipartBody.Part.createFormData("passportImage", it.name, it.asRequestBody(imageType))
-                    } ?: createEmptyPart("passportImage")
+                // Safe null handling for name parts
+                val fName = firstName ?: ""
+                val lName = lastName ?: ""
 
-                    val nationalIdImagePart = nationalIdImageFile?.let {
-                        MultipartBody.Part.createFormData("nationalIdImage", it.name, it.asRequestBody(imageType))
-                    } ?: createEmptyPart("nationalIdImage")
+                val titlePart = title.toRequestBody(textType)
+                val firstNamePart = fName.toRequestBody(textType)
+                val lastNamePart = lName.toRequestBody(textType)
+                val nationalityPart = nationality.toRequestBody(textType)
+                val occupationPart = occupation.toRequestBody(textType)
+                val dateOfBirthPart = dateOfBirth.toRequestBody(textType)
+                val placeOfBirthPart = placeOfBirth.toRequestBody(textType)
+                val countryPart = country.toRequestBody(textType)
+                val addressPart = address.toRequestBody(textType)
+                val districtPart = district.toRequestBody(textType)
+                val cityPart = city.toRequestBody(textType)
+                val postalCodePart = postalCode.toRequestBody(textType)
+                val isSameResidentialAddressPart = isSameResidentialAddress.toString().toRequestBody(textType)
+                val personalIdentificationNumberPart = personalIdentificationNumber.toRequestBody(textType)
 
-                    val passportSelfiePart = passportSelfieFile?.let {
-                        MultipartBody.Part.createFormData("passportSelfie", it.name, it.asRequestBody(imageType))
-                    } ?: createEmptyPart("passportSelfie")
+                Log.d(
+                    "KYC_DEBUG",
+                    "uploadKYC files: passport=${passportImageFile?.length()}, nationalId=${nationalIdImageFile?.length()}, passportSelfie=${passportSelfieFile?.length()}, nationalIdSelfie=${nationalIdSelfieImageFile?.length()}, signature=${digitalSignatureFile.length()}"
+                )
 
-                    val nationalIdSelfieImagePart = nationalIdSelfieImageFile?.let {
-                        MultipartBody.Part.createFormData("nationalIdSelfieImage", it.name, it.asRequestBody(imageType))
-                    } ?: createEmptyPart("nationalIdSelfieImage")
-
-                    val digitalSignaturePart = digitalSignatureFile?.let {
-                        MultipartBody.Part.createFormData("digitalSignature", it.name, it.asRequestBody(imageType))
-                    } ?: createEmptyPart("digitalSignature")
-
-                    Log.d("KYC_DEBUG", "uploadKYC: Sending request...")
-                    PayFundRetrofitInstance.holoBankApi.uploadKYC(
-                        token,
-                        titlePart,
-                        nationalityPart,
-                        occupationPart,
-                        dateOfBirthPart,
-                        placeOfBirthPart,
-                        countryPart,
-                        addressPart,
-                        districtPart,
-                        cityPart,
-                        postalCodePart,
-                        isSameResidentialAddressPart,
-                        personalIdentificationNumber,
-                        passportImagePart,
-                        nationalIdImagePart,
-                        passportSelfiePart,
-                        nationalIdSelfieImagePart,
-                        digitalSignaturePart
-                    )
+                val passportImagePart = passportImageFile?.let {
+                    MultipartBody.Part.createFormData("passportImage", it.name, it.asRequestBody(imageType))
                 }
-
-                Log.d("KYC_DEBUG", "uploadKYC: Response received - Success: ${response.isSuccessful}")
-
-                if (response.isSuccessful && response.body() != null) {
-                    val body = response.body()!!
-                 Log.d("KYC_DEBUG", "uploadKYC: Body received - Success: ${body}")
-
-                        uiState = ViewState.Success
-                        onSuccess()
-                } else {
-                    uiState = ViewState.Error(Exception(getErrorMessage(response)))
+                val nationalIdImagePart = nationalIdImageFile?.let {
+                    MultipartBody.Part.createFormData("nationalIdImage", it.name, it.asRequestBody(imageType))
                 }
-            } catch (e: Exception) {
-                uiState = ViewState.Error(e)
+                val passportSelfiePart = passportSelfieFile?.let {
+                    MultipartBody.Part.createFormData("passportSelfie", it.name, it.asRequestBody(imageType))
+                }
+                val nationalIdSelfieImagePart = nationalIdSelfieImageFile?.let {
+                    MultipartBody.Part.createFormData("nationalIdSelfieImage", it.name, it.asRequestBody(imageType))
+                }
+                val digitalSignaturePart = MultipartBody.Part.createFormData(
+                    "digitalSignature", digitalSignatureFile.name, digitalSignatureFile.asRequestBody(imageType)
+                )
+
+                Log.d("KYC_DEBUG", "uploadKYC: Sending request to holoBankApi...")
+                PayFundRetrofitInstance.holoBankApi.uploadKYC(
+                    token, titlePart, firstNamePart, lastNamePart, nationalityPart, occupationPart,
+                    dateOfBirthPart, placeOfBirthPart, countryPart, addressPart, districtPart, cityPart,
+                    postalCodePart, isSameResidentialAddressPart, personalIdentificationNumberPart,
+                    passportImagePart, nationalIdImagePart, passportSelfiePart, nationalIdSelfieImagePart,
+                    digitalSignaturePart
+                )
             }
+
+            Log.d("KYC_DEBUG", "uploadKYC: Response received. Code=${response.code()}, isSuccessful=${response.isSuccessful}")
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+                Log.d("KYC_DEBUG", "uploadKYC: Body received - isSuccess=${body.isSuccess}, message=${body.message}")
+
+                if (body.isSuccess) {
+                    uiState = ViewState.Success
+                    Log.d("KYC_DEBUG", "uploadKYC: Calling onSuccess callback")
+                   onSuccess()
+                } else {
+                    Log.e("KYC_DEBUG", "uploadKYC: Backend returned business error - ${body.message}")
+                    uiState = ViewState.Error(Exception(body.message))
+                }
+            } else {
+                val errorMsg = getErrorMessage(response)
+                Log.e("KYC_DEBUG", "uploadKYC: Request failed or empty body. Error: $errorMsg")
+                uiState = ViewState.Error(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Log.e("KYC_DEBUG", "uploadKYC: Exception caught", e)
+            uiState = ViewState.Error(e)
         }
     }
+}
 
     private fun createEmptyPart(name: String): MultipartBody.Part {
         val emptyBody = "".toRequestBody("text/plain".toMediaTypeOrNull())

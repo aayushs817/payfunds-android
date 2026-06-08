@@ -47,7 +47,7 @@ class MainActivityViewModel(
         }
         viewModelScope.launch {
             tonConnectManager.sendRequestFlow.collect {
-                tcSendRequest.postValue(it)
+                tcSendRequest.postValue(it.request)
             }
         }
         viewModelScope.launch {
