@@ -75,9 +75,11 @@ object WCDelegate : Web3Wallet.WalletDelegate, CoreClient.CoreDelegate {
         }
     }
 
-//    override fun onSessionExtend(session: Wallet.Model.Session) {
-//        Log.d("Session Extend", "${session.expiry}")
-//    }
+    override fun onSessionExtend(session: Wallet.Model.Session) {
+        scope.launch {
+            _walletEvents.emit(session)
+        }
+    }
 
     override fun onSessionProposal(
         sessionProposal: Wallet.Model.SessionProposal,

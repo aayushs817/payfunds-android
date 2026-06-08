@@ -1,6 +1,8 @@
 package com.payfunds.wallet.core.managers
 
 import android.content.Context
+import com.payfunds.wallet.BuildConfig
+import com.payfunds.wallet.R
 import com.tonapps.wallet.data.tonconnect.entities.DAppRequestEntity
 import io.horizontalsystems.tonkit.core.TonKit
 import io.horizontalsystems.tonkit.models.Network
@@ -10,7 +12,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 class TonConnectManager(context: Context, val adapterFactory: AdapterFactory) {
-    val kit = TonConnectKit.getInstance(context)
+    val kit = TonConnectKit.getInstance(
+        context,
+        context.getString(R.string.app_name),
+        BuildConfig.VERSION_NAME
+    )
     val transactionSigner = TonKit.getTransactionSigner(TonKit.getTonApi(Network.MainNet))
 
     val sendRequestFlow by kit::sendRequestFlow

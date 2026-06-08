@@ -11,6 +11,34 @@ include 'ethereumkit:nftkit'
 include 'ethereumkit:oneinchkit'
 include 'ethereumkit:uniswapkit'
 
+includeBuild('vendor/bitcoin-kit-android') {
+    dependencySubstitution {
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:bitcoincashkit') using project(':bitcoincashkit')
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:bitcoincore') using project(':bitcoincore')
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:bitcoinkit') using project(':bitcoinkit')
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:dashkit') using project(':dashkit')
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:ecashkit') using project(':ecashkit')
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:hodler') using project(':hodler')
+        substitute module('com.github.horizontalsystems.bitcoin-kit-android:litecoinkit') using project(':litecoinkit')
+    }
+}
+
+includeBuild('vendor/ton-kit-android') {
+    dependencySubstitution {
+        substitute module('com.github.horizontalsystems:ton-kit-android') using project(':tonkit')
+    }
+}
+
+includeBuild('vendor/WalletConnectKotlinV2') {
+    dependencySubstitution {
+        substitute module('com.walletconnect:android-core') using project(':core:android')
+        substitute module('com.walletconnect:auth') using project(':protocol:auth')
+        substitute module('com.walletconnect:foundation') using project(':foundation')
+        substitute module('com.walletconnect:sign') using project(':protocol:sign')
+        substitute module('com.walletconnect:web3wallet') using project(':product:web3wallet')
+    }
+}
+
 dependencyResolutionManagement {
     repositories {
         google()
